@@ -1,26 +1,50 @@
 [
+  // Chest patches - Note: Wildcards are NOT supported in Vintage Story JSON patches.
+  // Each chest variant (north, east, south, west) must be patched individually.
   {
     "op": "replace",
-    "path": "/entityclass",
-    "value": "GenericContainer",
-    "file": "game:blocktypes/wood/chest-*.json"
+    "path": "/attributes/quantitySlots",
+    "value": 32,
+    "file": "game:blocktypes/wood/generic/chest-north"
   },
   {
     "op": "replace",
     "path": "/attributes/quantitySlots",
     "value": 32,
-    "file": "game:blocktypes/wood/chest-*.json"
+    "file": "game:blocktypes/wood/generic/chest-east"
+  },
+  {
+    "op": "replace",
+    "path": "/attributes/quantitySlots",
+    "value": 32,
+    "file": "game:blocktypes/wood/generic/chest-south"
+  },
+  {
+    "op": "replace",
+    "path": "/attributes/quantitySlots",
+    "value": 32,
+    "file": "game:blocktypes/wood/generic/chest-west"
+  },
+  
+  // Storage vessel patches - Each material variant must be patched individually
+  {
+    "op": "replace",
+    "path": "/attributes/quantitySlots",
+    "value": 24,
+    "file": "game:blocktypes/clay/vessel-burned-normal"
   },
   {
     "op": "replace",
     "path": "/attributes/quantitySlots",
     "value": 24,
-    "file": "game:blocktypes/clay/storagevessel-*.json"
+    "file": "game:blocktypes/clay/vessel-burned-raw"
   },
+  
+  // Crate patch
   {
     "op": "replace",
     "path": "/attributes/quantitySlots",
     "value": 48,
-    "file": "game:blocktypes/wood/crate.json"
+    "file": "game:blocktypes/wood/crate"
   }
 ]
