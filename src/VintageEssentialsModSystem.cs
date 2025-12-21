@@ -16,6 +16,28 @@ namespace VintageEssentials
         private LockedSlotsManager lockedSlotsManager;
         private ModConfig config;
 
+        public override void Start(ICoreAPI api)
+        {
+            base.Start(api);
+            
+            // Patch all collectibles to have increased stack sizes
+            api.World.Logger.Event("VintageEssentials: Applying stack size patches...");
+        }
+
+        public override void AssetsFinalize(ICoreAPI api)
+        {
+            // Patch stack sizes for all collectibles (items and blocks)
+            foreach (var collectible in api.World.Collectibles)
+            {
+                if (collectible != null && collectible.MaxStackSize < 1000)
+                {
+                    collectible.MaxStackSize = 1000;
+                }
+            }
+            
+            api.World.Logger.Event($"VintageEssentials: Patched stack sizes for {api.World.Collectibles.Count} collectibles");
+        }
+
         public override void StartServerSide(ICoreServerAPI api)
         {
             base.StartServerSide(api);

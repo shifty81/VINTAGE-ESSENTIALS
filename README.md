@@ -215,6 +215,43 @@ Home locations are saved persistently in the world save data and will survive se
 
 All commands require the `chat` privilege, which all players have by default.
 
+## Development Documentation
+
+For developers and modders working with or learning from this project:
+
+- **[MODDING_GUIDELINES.md](MODDING_GUIDELINES.md)** - Comprehensive Vintage Story modding guidelines including:
+  - Asset system structure and organization
+  - JSON patching best practices (with important notes on case sensitivity and wildcards)
+  - Code modding patterns and ModSystem lifecycle
+  - Common issues and solutions
+  - Troubleshooting guide
+
+- **[ASSET_GENERATION.md](ASSET_GENERATION.md)** - Detailed asset creation guide covering:
+  - Texture creation and specifications
+  - 3D model creation with VS Model Creator
+  - Item and block asset structure
+  - Recipe creation for all types
+  - Sound asset integration
+  - Localization best practices
+
+These guides are based on official Vintage Story documentation, community best practices, and lessons learned from developing this mod.
+
+## Technical Notes
+
+### Stack Size Implementation
+
+This mod implements increased stack sizes (up to 1000) using **code-based asset patching** rather than JSON patches. This is the recommended approach when modifying many items at once because:
+
+- JSON patches don't support wildcards (can't use `game:itemtypes/*`)
+- Property names are case-sensitive in JSON (`maxstacksize` not `maxStackSize`)
+- Code patching is more maintainable and performant for bulk changes
+
+The implementation is in `VintageEssentialsModSystem.AssetsFinalize()`.
+
+### Storage Container Modifications
+
+Container slot changes (chests, storage vessels, crates) use JSON patches in `assets/vintageessentials/patches/blocktypes/storage.json`. Each container variant must be patched individually.
+
 ## License
 
 See LICENSE file for details.
