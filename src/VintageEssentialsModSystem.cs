@@ -29,6 +29,11 @@ namespace VintageEssentials
 
         public override void AssetsFinalize(ICoreAPI api)
         {
+            // Constants for stack size limits
+            const int SMALL_ITEM_THRESHOLD = 10;  // Items that stack to 10 or less
+            const int VANILLA_CAP = 1000;          // Max stack for items already high
+            const int MAX_ALLOWED_STACK = 10000;   // Absolute maximum stack size
+            
             // Reload config to ensure we have the latest settings
             if (config == null)
             {
@@ -47,17 +52,17 @@ namespace VintageEssentials
                     
                     // Only apply to items that originally stack up to 10 or less
                     // (or already modified items with higher values)
-                    if (originalMaxStack > 0 && originalMaxStack <= 10)
+                    if (originalMaxStack > 0 && originalMaxStack <= SMALL_ITEM_THRESHOLD)
                     {
                         // Apply multiplier
                         int newMaxStack = originalMaxStack * config.StackSizeMultiplier;
                         collectible.MaxStackSize = newMaxStack;
                         patchedCount++;
                     }
-                    else if (originalMaxStack > 10 && originalMaxStack < 1000)
+                    else if (originalMaxStack > SMALL_ITEM_THRESHOLD && originalMaxStack < VANILLA_CAP)
                     {
                         // For items that stack higher than 10, also apply multiplier but cap at reasonable value
-                        int newMaxStack = Math.Min(originalMaxStack * config.StackSizeMultiplier, 10000);
+                        int newMaxStack = Math.Min(originalMaxStack * config.StackSizeMultiplier, MAX_ALLOWED_STACK);
                         collectible.MaxStackSize = newMaxStack;
                         patchedCount++;
                     }

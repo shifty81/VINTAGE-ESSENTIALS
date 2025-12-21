@@ -118,8 +118,12 @@ namespace VintageEssentials
             {
                 return result;
             }
-            // Default fallback
-            return GlKeys.Unknown;
+            
+            // Log error for invalid key name
+            clientApi.Logger.Warning($"VintageEssentials: Invalid key name '{keyName}' in config, using default");
+            
+            // Return a safe default (Letter R)
+            return GlKeys.R;
         }
         
         private void OnKeybindsChanged()
@@ -128,6 +132,7 @@ namespace VintageEssentials
             // Note: We need to unregister and re-register hotkeys
             // Unfortunately, the VS API doesn't provide a direct way to unregister hotkeys
             // So we'll just re-register them which will override the previous handlers
+            clientApi.Logger.Debug("VintageEssentials: Re-registering hotkeys after config change");
             RegisterKeybinds();
             clientApi.ShowChatMessage("Keybinds updated!");
         }

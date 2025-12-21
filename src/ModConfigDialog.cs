@@ -218,7 +218,7 @@ namespace VintageEssentials
                 }
                 
                 // Capture the key
-                string keyName = System.Enum.GetName(typeof(GlKeys), e.KeyCode);
+                string keyName = Enum.GetName(typeof(GlKeys), e.KeyCode);
                 if (!string.IsNullOrEmpty(keyName))
                 {
                     tempKeybinds[capturingCode] = new KeybindConfig
