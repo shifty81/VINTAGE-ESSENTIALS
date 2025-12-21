@@ -41,12 +41,19 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 
 - **Press `Ctrl+Shift+V`** or use `/veconfig` - Open the mod settings dialog
 - Configure maximum number of locked slots (1-20)
-- View all keybinds and their functions
-- **Keybind conflict detection** - Get notified if mod keybinds conflict with game keybinds
+- **Customize all keybinds** - Change keybinds directly from the settings dialog without going to game options
+- **Stack size multiplier** - Adjust global stack sizes with a slider (1x-200x, applies to items that initially stack ≤10)
+- **Real-time keybind conflict detection** - Get notified if mod keybinds conflict with other game or mod keybinds
+- **Direct conflict resolution** - Change conflicting keybinds immediately when prompted
+- All settings are saved globally and persist across game sessions
 
 ### Stack Size Increases
 
-- All items now stack up to **1000** (increased from default values)
+- **Configurable stack sizes** - Use the slider in mod settings to adjust the multiplier (default 100x)
+- Applies to items that initially stack up to 10 (e.g., tools, equipment)
+- For items with 10x base stack: 100x multiplier = 1000 max stack
+- Adjust from 1x (vanilla) to 200x (2000 max stack) based on your preference
+- **Requires game restart** to apply changes
 - Storage containers have increased capacity:
   - Chests: 32 slots
   - Storage Vessels: 24 slots
@@ -61,12 +68,14 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 
 ## Keybinds
 
-- **`R`** - Open Chest Radius Inventory (shows all items in chests within 15 blocks)
-- **`Shift+S`** - Sort Player Inventory (cycles through sort modes, respects locked slots)
-- **`Ctrl+L`** - Toggle Inventory Slot Locking Mode (click slots to lock/unlock them)
-- **`Ctrl+Shift+V`** - Open Mod Configuration Dialog
+All keybinds can be customized directly from the mod settings dialog (`Ctrl+Shift+V` or `/veconfig`):
 
-You can rebind these keys in the game's Controls settings.
+- **`R`** (default) - Open Chest Radius Inventory (shows all items in chests within 15 blocks)
+- **`Shift+S`** (default) - Sort Player Inventory (cycles through sort modes, respects locked slots)
+- **`Ctrl+L`** (default) - Toggle Inventory Slot Locking Mode (click slots to lock/unlock them)
+- **`Ctrl+Shift+V`** (default) - Open Mod Configuration Dialog
+
+**Note:** You can change these keybinds in the mod settings dialog. The mod will automatically detect conflicts with other game or mod keybinds and prompt you to resolve them.
 
 ## Building
 

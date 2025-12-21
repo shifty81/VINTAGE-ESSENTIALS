@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 
@@ -32,8 +33,8 @@ namespace VintageEssentials
             chestRadiusDialog = new ChestRadiusInventoryDialog(api);
             playerSortDialog = new PlayerInventorySortDialog(api, lockedSlotsManager);
             inventoryLockDialog = new InventoryLockDialog(api, lockedSlotsManager, config, OnLockingModeChanged);
-            keybindConflictDialog = new KeybindConflictDialog(api);
-            configDialog = new ModConfigDialog(api, config);
+            keybindConflictDialog = new KeybindConflictDialog(api, config, OnKeybindsChanged);
+            configDialog = new ModConfigDialog(api, config, OnKeybindsChanged);
 
             // Create HUD overlay for locked slots
             lockedSlotsHudOverlay = new LockedSlotsHudOverlay(api, lockedSlotsManager);
@@ -43,21 +44,8 @@ namespace VintageEssentials
             slotClickHandler = new InventorySlotClickHandler(api, inventoryLockDialog, lockedSlotsManager);
             slotClickHandler.Initialize();
 
-            // Register keybind for chest radius inventory
-            clientApi.Input.RegisterHotKey("chestradius", "Open Chest Radius Inventory", GlKeys.R, HotkeyType.GUIOrOtherControls);
-            clientApi.Input.SetHotKeyHandler("chestradius", OnChestRadiusHotkey);
-
-            // Register keybind for player inventory sort
-            clientApi.Input.RegisterHotKey("playerinvsort", "Sort Player Inventory", GlKeys.S, HotkeyType.InventoryHotkeys, shiftPressed: true);
-            clientApi.Input.SetHotKeyHandler("playerinvsort", OnPlayerSortHotkey);
-
-            // Register keybind for toggling slot locking mode
-            clientApi.Input.RegisterHotKey("toggleslotlock", "Toggle Inventory Slot Locking Mode", GlKeys.L, HotkeyType.InventoryHotkeys, ctrlPressed: true);
-            clientApi.Input.SetHotKeyHandler("toggleslotlock", OnToggleSlotLockHotkey);
-
-            // Register keybind for opening config dialog
-            clientApi.Input.RegisterHotKey("veconfig", "Open VintageEssentials Settings", GlKeys.V, HotkeyType.GUIOrOtherControls, ctrlPressed: true, shiftPressed: true);
-            clientApi.Input.SetHotKeyHandler("veconfig", OnConfigHotkey);
+            // Register keybinds using config
+            RegisterKeybinds();
 
             // Register client chat command for config
             clientApi.RegisterCommand("veconfig", "Opens VintageEssentials configuration", "", (id, args) =>
@@ -71,11 +59,103 @@ namespace VintageEssentials
             clientApi.Logger.Notification("VintageEssentials client-side loaded.");
             clientApi.ShowChatMessage("VintageEssentials loaded! Press Ctrl+Shift+V to open settings or use /veconfig");
         }
+        
+        private KeybindConfig GetKeybindOrDefault(string hotkeyCode)
+        {
+            if (config.CustomKeybinds.ContainsKey(hotkeyCode))
+            {
+                return config.CustomKeybinds[hotkeyCode];
+            }
+            
+            // Return default keybinds
+            switch (hotkeyCode)
+            {
+                case "chestradius":
+                    return new KeybindConfig { Key = "R" };
+                case "playerinvsort":
+                    return new KeybindConfig { Key = "S", Shift = true };
+                case "toggleslotlock":
+                    return new KeybindConfig { Key = "L", Ctrl = true };
+                case "veconfig":
+                    return new KeybindConfig { Key = "V", Ctrl = true, Shift = true };
+                default:
+                    return new KeybindConfig { Key = "Unknown" };
+            }
+        }
+        
+        private void RegisterKeybinds()
+        {
+            // Chest radius inventory
+            var chestRadiusKey = GetKeybindOrDefault("chestradius");
+            GlKeys chestRadiusGlKey = ParseGlKey(chestRadiusKey.Key);
+            clientApi.Input.RegisterHotKey("chestradius", "Open Chest Radius Inventory", chestRadiusGlKey, 
+                HotkeyType.GUIOrOtherControls, 
+                shiftPressed: chestRadiusKey.Shift, 
+                ctrlPressed: chestRadiusKey.Ctrl, 
+                altPressed: chestRadiusKey.Alt);
+            clientApi.Input.SetHotKeyHandler("chestradius", OnChestRadiusHotkey);
+
+            // Player inventory sort
+            var playerSortKey = GetKeybindOrDefault("playerinvsort");
+            GlKeys playerSortGlKey = ParseGlKey(playerSortKey.Key);
+            clientApi.Input.RegisterHotKey("playerinvsort", "Sort Player Inventory", playerSortGlKey, 
+                HotkeyType.InventoryHotkeys, 
+                shiftPressed: playerSortKey.Shift, 
+                ctrlPressed: playerSortKey.Ctrl, 
+                altPressed: playerSortKey.Alt);
+            clientApi.Input.SetHotKeyHandler("playerinvsort", OnPlayerSortHotkey);
+
+            // Toggle slot locking
+            var toggleLockKey = GetKeybindOrDefault("toggleslotlock");
+            GlKeys toggleLockGlKey = ParseGlKey(toggleLockKey.Key);
+            clientApi.Input.RegisterHotKey("toggleslotlock", "Toggle Inventory Slot Locking Mode", toggleLockGlKey, 
+                HotkeyType.InventoryHotkeys, 
+                shiftPressed: toggleLockKey.Shift, 
+                ctrlPressed: toggleLockKey.Ctrl, 
+                altPressed: toggleLockKey.Alt);
+            clientApi.Input.SetHotKeyHandler("toggleslotlock", OnToggleSlotLockHotkey);
+
+            // Config dialog
+            var configKey = GetKeybindOrDefault("veconfig");
+            GlKeys configGlKey = ParseGlKey(configKey.Key);
+            clientApi.Input.RegisterHotKey("veconfig", "Open VintageEssentials Settings", configGlKey, 
+                HotkeyType.GUIOrOtherControls, 
+                shiftPressed: configKey.Shift, 
+                ctrlPressed: configKey.Ctrl, 
+                altPressed: configKey.Alt);
+            clientApi.Input.SetHotKeyHandler("veconfig", OnConfigHotkey);
+        }
+        
+        private GlKeys ParseGlKey(string keyName)
+        {
+            // Try to parse the key name to GlKeys enum
+            if (System.Enum.TryParse<GlKeys>(keyName, true, out GlKeys result))
+            {
+                return result;
+            }
+            
+            // Log error for invalid key name
+            clientApi.Logger.Warning($"VintageEssentials: Invalid key name '{keyName}' in config, using default");
+            
+            // Return a safe default (Letter R)
+            return GlKeys.R;
+        }
+        
+        private void OnKeybindsChanged()
+        {
+            // Reload keybinds when they change
+            // Note: We need to unregister and re-register hotkeys
+            // Unfortunately, the VS API doesn't provide a direct way to unregister hotkeys
+            // So we'll just re-register them which will override the previous handlers
+            clientApi.Logger.Debug("VintageEssentials: Re-registering hotkeys after config change");
+            RegisterKeybinds();
+            clientApi.ShowChatMessage("Keybinds updated!");
+        }
 
         private void OnPlayerSpawn(IClientPlayer player)
         {
             // Check for keybind conflicts
-            List<string> conflicts = CheckKeybindConflicts();
+            List<ConflictInfo> conflicts = CheckKeybindConflicts();
             if (conflicts.Count > 0)
             {
                 // Show conflict resolution dialog
@@ -83,30 +163,59 @@ namespace VintageEssentials
             }
         }
 
-        private List<string> CheckKeybindConflicts()
+        private List<ConflictInfo> CheckKeybindConflicts()
         {
-            List<string> conflicts = new List<string>();
+            List<ConflictInfo> conflicts = new List<ConflictInfo>();
             
-            // Get all registered hotkeys
-            var registeredKeys = new Dictionary<string, string>
+            // Get our registered hotkeys using the helper method
+            var ourHotkeys = new Dictionary<string, KeybindConfig>
             {
-                { "chestradius", "R" },
-                { "playerinvsort", "Shift+S" },
-                { "toggleslotlock", "Ctrl+L" },
-                { "veconfig", "Ctrl+Shift+V" }
+                { "chestradius", GetKeybindOrDefault("chestradius") },
+                { "playerinvsort", GetKeybindOrDefault("playerinvsort") },
+                { "toggleslotlock", GetKeybindOrDefault("toggleslotlock") },
+                { "veconfig", GetKeybindOrDefault("veconfig") }
             };
 
-            // Check for conflicts with existing game keybinds
-            // This is a simplified check - in a real implementation, you'd check against
-            // all registered keybinds in the game
-            foreach (var kvp in registeredKeys)
+            // Check for conflicts with all registered game hotkeys
+            var allHotkeys = clientApi.Input.HotKeys;
+            
+            foreach (var ourHotkey in ourHotkeys)
             {
-                string hotkeyCode = kvp.Key;
-                string keyCombination = kvp.Value;
+                string ourCode = ourHotkey.Key;
+                KeybindConfig ourKey = ourHotkey.Value;
                 
-                // Check if this keybind conflicts with vanilla game keybinds
-                // For now, we'll just log potential conflicts
-                // A more complete implementation would check clientApi.Input.HotKeys
+                // Skip if not registered yet (first time)
+                if (!allHotkeys.ContainsKey(ourCode))
+                {
+                    continue;
+                }
+                
+                // Check against all other hotkeys
+                foreach (var gameHotkey in allHotkeys)
+                {
+                    // Skip if it's our own hotkey
+                    if (gameHotkey.Key == ourCode)
+                    {
+                        continue;
+                    }
+                    
+                    var gameKey = gameHotkey.Value;
+                    
+                    // Compare keybinds
+                    if (gameKey.CurrentMapping.KeyCode == ParseGlKey(ourKey.Key) &&
+                        gameKey.CurrentMapping.Shift == ourKey.Shift &&
+                        gameKey.CurrentMapping.Ctrl == ourKey.Ctrl &&
+                        gameKey.CurrentMapping.Alt == ourKey.Alt)
+                    {
+                        conflicts.Add(new ConflictInfo
+                        {
+                            HotkeyCode = ourCode,
+                            ConflictingWith = $"{gameHotkey.Key} - {gameKey.Name}",
+                            Description = $"Conflicts with {gameKey.Name}"
+                        });
+                        break; // Only report first conflict per hotkey
+                    }
+                }
             }
 
             return conflicts;

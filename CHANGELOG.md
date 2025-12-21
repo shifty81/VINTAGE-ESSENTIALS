@@ -5,6 +5,28 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 ## [Unreleased]
 
 ### Added
+- **Keybind Customization System** - Full GUI-based keybind configuration:
+  - All keybinds can now be customized directly from the mod settings dialog
+  - No need to go to game Options > Controls menu
+  - Real-time keybind conflict detection against all game and mod hotkeys
+  - Interactive conflict resolution dialog prompts users to change conflicting keybinds
+  - Support for Ctrl, Shift, and Alt modifiers
+  - All keybind settings are saved globally and persist across sessions
+  
+- **Global Stack Size Multiplier** - Configurable stack sizes for all items:
+  - Slider control in mod settings (1x to 200x multiplier)
+  - Applies to items that initially stack up to 10 (tools, equipment, etc.)
+  - Default 100x multiplier (10-stack items become 1000-stack)
+  - Changes require game restart to take effect
+  - Provides fine-grained control over inventory management
+
+- **Enhanced Mod Configuration Dialog**:
+  - Interactive keybind editing with visual feedback
+  - Stack size multiplier slider with real-time preview
+  - Key capture functionality for easy keybind assignment
+  - Clear indication of current keybind settings
+  - Information about when restart is required
+
 - **MODDING_GUIDELINES.md** - Comprehensive modding guidelines document covering:
   - Asset system structure and organization
   - JSON patching best practices with case sensitivity and wildcard limitations
@@ -35,7 +57,14 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
   - Corrected file paths to match actual game asset structure (`game:blocktypes/wood/generic/chest-north`)
   
 ### Changed
-- Updated README.md with links to new documentation
+- **Stack Size Implementation** - Now configurable via mod settings:
+  - Previously hardcoded to 1000 max stack for all items
+  - Now uses configurable multiplier (default 100x) from mod settings
+  - Applies multiplier only to items with initial stack size ≤10 (as per design)
+  - Items with higher initial stacks also get multiplied but capped at 10000
+  - Provides player choice for inventory management style
+  
+- Updated README.md with new keybind customization and stack size features
 - Added technical notes section explaining implementation choices
 - Documented the proper approach for bulk asset modifications
 

@@ -26,16 +26,44 @@ namespace VintageEssentials
 
         public override void AssetsFinalize(ICoreAPI api)
         {
+            // Constants for stack size limits
+            const int SMALL_ITEM_THRESHOLD = 10;  // Items that stack to 10 or less
+            const int VANILLA_CAP = 1000;          // Max stack for items already high
+            const int MAX_ALLOWED_STACK = 10000;   // Absolute maximum stack size
+            
+            // Load configuration
+            config = ModConfig.Load(api);
+            
+            int patchedCount = 0;
+            
             // Patch stack sizes for all collectibles (items and blocks)
             foreach (var collectible in api.World.Collectibles)
             {
-                if (collectible != null && collectible.MaxStackSize < 1000)
+                if (collectible != null)
                 {
-                    collectible.MaxStackSize = 1000;
+                    // Get the original/current max stack size
+                    int originalMaxStack = collectible.MaxStackSize;
+                    
+                    // Only apply to items that originally stack up to 10 or less
+                    // (or already modified items with higher values)
+                    if (originalMaxStack > 0 && originalMaxStack <= SMALL_ITEM_THRESHOLD)
+                    {
+                        // Apply multiplier
+                        int newMaxStack = originalMaxStack * config.StackSizeMultiplier;
+                        collectible.MaxStackSize = newMaxStack;
+                        patchedCount++;
+                    }
+                    else if (originalMaxStack > SMALL_ITEM_THRESHOLD && originalMaxStack < VANILLA_CAP)
+                    {
+                        // For items that stack higher than 10, also apply multiplier but cap at reasonable value
+                        int newMaxStack = Math.Min(originalMaxStack * config.StackSizeMultiplier, MAX_ALLOWED_STACK);
+                        collectible.MaxStackSize = newMaxStack;
+                        patchedCount++;
+                    }
                 }
             }
             
-            api.World.Logger.Event($"VintageEssentials: Patched stack sizes for {api.World.Collectibles.Count} collectibles");
+            api.World.Logger.Event($"VintageEssentials: Patched stack sizes for {patchedCount} collectibles (multiplier: {config.StackSizeMultiplier}x)");
         }
 
         public override void StartServerSide(ICoreServerAPI api)
