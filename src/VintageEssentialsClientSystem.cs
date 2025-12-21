@@ -60,12 +60,33 @@ namespace VintageEssentials
             clientApi.ShowChatMessage("VintageEssentials loaded! Press Ctrl+Shift+V to open settings or use /veconfig");
         }
         
+        private KeybindConfig GetKeybindOrDefault(string hotkeyCode)
+        {
+            if (config.CustomKeybinds.ContainsKey(hotkeyCode))
+            {
+                return config.CustomKeybinds[hotkeyCode];
+            }
+            
+            // Return default keybinds
+            switch (hotkeyCode)
+            {
+                case "chestradius":
+                    return new KeybindConfig { Key = "R" };
+                case "playerinvsort":
+                    return new KeybindConfig { Key = "S", Shift = true };
+                case "toggleslotlock":
+                    return new KeybindConfig { Key = "L", Ctrl = true };
+                case "veconfig":
+                    return new KeybindConfig { Key = "V", Ctrl = true, Shift = true };
+                default:
+                    return new KeybindConfig { Key = "Unknown" };
+            }
+        }
+        
         private void RegisterKeybinds()
         {
             // Chest radius inventory
-            var chestRadiusKey = config.CustomKeybinds.ContainsKey("chestradius") 
-                ? config.CustomKeybinds["chestradius"] 
-                : new KeybindConfig { Key = "R" };
+            var chestRadiusKey = GetKeybindOrDefault("chestradius");
             GlKeys chestRadiusGlKey = ParseGlKey(chestRadiusKey.Key);
             clientApi.Input.RegisterHotKey("chestradius", "Open Chest Radius Inventory", chestRadiusGlKey, 
                 HotkeyType.GUIOrOtherControls, 
@@ -75,9 +96,7 @@ namespace VintageEssentials
             clientApi.Input.SetHotKeyHandler("chestradius", OnChestRadiusHotkey);
 
             // Player inventory sort
-            var playerSortKey = config.CustomKeybinds.ContainsKey("playerinvsort") 
-                ? config.CustomKeybinds["playerinvsort"] 
-                : new KeybindConfig { Key = "S", Shift = true };
+            var playerSortKey = GetKeybindOrDefault("playerinvsort");
             GlKeys playerSortGlKey = ParseGlKey(playerSortKey.Key);
             clientApi.Input.RegisterHotKey("playerinvsort", "Sort Player Inventory", playerSortGlKey, 
                 HotkeyType.InventoryHotkeys, 
@@ -87,9 +106,7 @@ namespace VintageEssentials
             clientApi.Input.SetHotKeyHandler("playerinvsort", OnPlayerSortHotkey);
 
             // Toggle slot locking
-            var toggleLockKey = config.CustomKeybinds.ContainsKey("toggleslotlock") 
-                ? config.CustomKeybinds["toggleslotlock"] 
-                : new KeybindConfig { Key = "L", Ctrl = true };
+            var toggleLockKey = GetKeybindOrDefault("toggleslotlock");
             GlKeys toggleLockGlKey = ParseGlKey(toggleLockKey.Key);
             clientApi.Input.RegisterHotKey("toggleslotlock", "Toggle Inventory Slot Locking Mode", toggleLockGlKey, 
                 HotkeyType.InventoryHotkeys, 
@@ -99,9 +116,7 @@ namespace VintageEssentials
             clientApi.Input.SetHotKeyHandler("toggleslotlock", OnToggleSlotLockHotkey);
 
             // Config dialog
-            var configKey = config.CustomKeybinds.ContainsKey("veconfig") 
-                ? config.CustomKeybinds["veconfig"] 
-                : new KeybindConfig { Key = "V", Ctrl = true, Shift = true };
+            var configKey = GetKeybindOrDefault("veconfig");
             GlKeys configGlKey = ParseGlKey(configKey.Key);
             clientApi.Input.RegisterHotKey("veconfig", "Open VintageEssentials Settings", configGlKey, 
                 HotkeyType.GUIOrOtherControls, 
@@ -152,13 +167,13 @@ namespace VintageEssentials
         {
             List<ConflictInfo> conflicts = new List<ConflictInfo>();
             
-            // Get our registered hotkeys
+            // Get our registered hotkeys using the helper method
             var ourHotkeys = new Dictionary<string, KeybindConfig>
             {
-                { "chestradius", config.CustomKeybinds.ContainsKey("chestradius") ? config.CustomKeybinds["chestradius"] : new KeybindConfig { Key = "R" } },
-                { "playerinvsort", config.CustomKeybinds.ContainsKey("playerinvsort") ? config.CustomKeybinds["playerinvsort"] : new KeybindConfig { Key = "S", Shift = true } },
-                { "toggleslotlock", config.CustomKeybinds.ContainsKey("toggleslotlock") ? config.CustomKeybinds["toggleslotlock"] : new KeybindConfig { Key = "L", Ctrl = true } },
-                { "veconfig", config.CustomKeybinds.ContainsKey("veconfig") ? config.CustomKeybinds["veconfig"] : new KeybindConfig { Key = "V", Ctrl = true, Shift = true } }
+                { "chestradius", GetKeybindOrDefault("chestradius") },
+                { "playerinvsort", GetKeybindOrDefault("playerinvsort") },
+                { "toggleslotlock", GetKeybindOrDefault("toggleslotlock") },
+                { "veconfig", GetKeybindOrDefault("veconfig") }
             };
 
             // Check for conflicts with all registered game hotkeys

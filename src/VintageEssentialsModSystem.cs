@@ -20,9 +20,6 @@ namespace VintageEssentials
         {
             base.Start(api);
             
-            // Load configuration early
-            config = ModConfig.Load(api);
-            
             // Patch all collectibles to have increased stack sizes
             api.World.Logger.Event("VintageEssentials: Applying stack size patches...");
         }
@@ -34,11 +31,8 @@ namespace VintageEssentials
             const int VANILLA_CAP = 1000;          // Max stack for items already high
             const int MAX_ALLOWED_STACK = 10000;   // Absolute maximum stack size
             
-            // Reload config to ensure we have the latest settings
-            if (config == null)
-            {
-                config = ModConfig.Load(api);
-            }
+            // Load configuration
+            config = ModConfig.Load(api);
             
             int patchedCount = 0;
             
