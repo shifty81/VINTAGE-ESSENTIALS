@@ -1,266 +1,55 @@
-# Vintage Essentials
+# VINTAGE-ESSENTIALS
 
-A comprehensive mod for Vintage Story that adds essential commands and quality of life improvements.
+A multi-mod repository for Vintage Story modding. Each mod lives in its own folder under `mods/`, making it easy to develop, reference, and manage individual mods independently.
 
-## Features
+## Repository Structure
 
-### Chat Commands
+```
+VINTAGE-ESSENTIALS/
+├── mods/
+│   └── VintageEssentials/      # Our first mod — quality of life improvements
+│       ├── src/                 # C# source code
+│       ├── assets/              # Game assets (patches, shapes, textures, etc.)
+│       ├── modinfo.json         # Mod metadata
+│       ├── VintageEssentials.csproj  # Build project
+│       ├── CHANGELOG.md         # Mod-specific changelog
+│       └── PORTABLE_CRAFTING_SPEC.md # Feature spec for portable crafting
+├── MODDING_GUIDELINES.md        # Shared modding reference (all mods)
+├── ASSET_GENERATION.md          # Shared asset creation guide (all mods)
+├── LICENSE
+└── README.md                    # This file
+```
 
-- **`/sethome`** - Sets your home location at your current position
-- **`/home`** - Teleports you to your saved home location
-- **`/rtp <direction>`** - Randomly teleports you 10,000-20,000 blocks in the specified direction (north, south, east, or west)
+## Mods
 
-### Chest Radius Inventory (NEW!)
+| Mod | Description | Folder |
+|-----|-------------|--------|
+| [Vintage Essentials](mods/VintageEssentials/) | Essential commands and quality of life improvements including `/home`, `/sethome`, `/rtp`, chest radius inventory, inventory sorting, slot locking, and configurable stack sizes | `mods/VintageEssentials/` |
 
-- **Press `R`** - Opens a special inventory dialog showing all items in chests within 15 blocks
-- **Searchable** - Type to filter items by name
-- **Sortable** - Toggle sorting by name (A-Z)
-- **Scrollable Grid** - View all items in an organized grid layout
-- **Shift-click support** - Shift-click items in the storage display to move them to your inventory
-- **Deposit All** - Quickly move ALL items from your inventory to nearby chests (stacks with existing items first, then fills empty slots)
-- **Take All** - Pull items from nearby chests into your inventory
-- Integrates seamlessly with the game's inventory system
+## Working on a Mod
 
-### Player Inventory Sorting
-
-- **Press `Shift+S`** - Sort your player inventory by name (A-Z)
-- **Locked slots are preserved** - Items in locked slots won't be moved during sorting
-- Quick and convenient organization
-- **Preserves hotbar and offhand** - Your hotbar (slots 1-10) and offhand items remain in place
-
-### Inventory Slot Locking (NEW!)
-
-- **Press `Ctrl+L`** - Toggle slot locking mode
-- **Click on inventory slots** - Lock or unlock up to 10 slots (configurable)
-- **Visual indicators** - Locked slots display a semi-transparent overlay with diagonal lines
-- **Persistent** - Locked slots are saved per character
-- **Protected during sorting** - Items in locked slots stay in place when you sort your inventory
-- Keep your most-used items in predictable locations!
-
-### Mod Configuration
-
-- **Press `Ctrl+Shift+V`** or use `/veconfig` - Open the mod settings dialog
-- Configure maximum number of locked slots (1-20)
-- **Customize all keybinds** - Change keybinds directly from the settings dialog without going to game options
-- **Stack size multiplier** - Adjust global stack sizes with a slider (1x-200x, applies to items that initially stack ≤10)
-- **Real-time keybind conflict detection** - Get notified if mod keybinds conflict with other game or mod keybinds
-- **Direct conflict resolution** - Change conflicting keybinds immediately when prompted
-- All settings are saved globally and persist across game sessions
-
-### Stack Size Increases
-
-- **Configurable stack sizes** - Use the slider in mod settings to adjust the multiplier (default 100x)
-- Applies to items that initially stack up to 10 (e.g., tools, equipment)
-- For items with 10x base stack: 100x multiplier = 1000 max stack
-- Adjust from 1x (vanilla) to 200x (2000 max stack) based on your preference
-- **Requires game restart** to apply changes
-- Storage containers have increased capacity:
-  - Chests: 32 slots
-  - Storage Vessels: 24 slots
-  - Crates: 48 slots
-
-## Installation
-
-1. Build the mod or download the compiled `.zip` file
-2. Place `VintageEssentials.zip` in your `VintagestoryData/Mods` folder
-3. **The mod must be installed on both client and server** for all features to work
-4. Restart your game/server
-
-## Keybinds
-
-All keybinds can be customized directly from the mod settings dialog (`Ctrl+Shift+V` or `/veconfig`):
-
-- **`R`** (default) - Open Chest Radius Inventory (shows all items in chests within 15 blocks)
-- **`Shift+S`** (default) - Sort Player Inventory (cycles through sort modes, respects locked slots)
-- **`Ctrl+L`** (default) - Toggle Inventory Slot Locking Mode (click slots to lock/unlock them)
-- **`Ctrl+Shift+V`** (default) - Open Mod Configuration Dialog
-
-**Note:** You can change these keybinds in the mod settings dialog. The mod will automatically detect conflicts with other game or mod keybinds and prompt you to resolve them.
-
-## Building
-
-### Requirements
-- .NET 7.0 SDK or later ([Download here](https://dotnet.microsoft.com/download))
-- Vintage Story installed ([Get it here](https://www.vintagestory.at/))
-
-### Quick Build
-
-If your Vintage Story installation is in one of these default locations, you can simply run:
+Each mod is self-contained in its own folder. To work on a specific mod, navigate to its folder:
 
 ```bash
+cd mods/VintageEssentials
 dotnet build
 ```
 
-The project will automatically detect Vintage Story in:
-- Windows: `C:\Program Files\Vintagestory`
-- Linux: `/usr/share/vintagestory` or `~/.local/share/Vintagestory`
+To add a new mod, create a new folder under `mods/`:
 
-The compiled mod will be in `bin/Debug/VintageEssentials.zip`.
-
-### Custom Installation Path
-
-If Vintage Story is installed in a different location, set the `VINTAGE_STORY` environment variable:
-
-**Windows (PowerShell):**
-```powershell
-$env:VINTAGE_STORY = "C:\Path\To\Vintagestory"
-dotnet build
-```
-
-**Windows (Command Prompt):**
-```cmd
-set VINTAGE_STORY=C:\Path\To\Vintagestory
-dotnet build
-```
-
-**Linux/macOS (Bash):**
 ```bash
-export VINTAGE_STORY="/path/to/Vintagestory"
-dotnet build
+mkdir mods/YourNewMod
 ```
 
-Or set it inline:
-```bash
-VINTAGE_STORY="/path/to/Vintagestory" dotnet build
-```
+Then set up the standard Vintage Story mod structure inside it (see [MODDING_GUIDELINES.md](MODDING_GUIDELINES.md) for details).
 
-### Build Configurations
+## Shared Modding Resources
 
-**Debug Build (default):**
-```bash
-dotnet build
-```
-Output: `bin/Debug/VintageEssentials.zip`
+These reference documents apply to all mods in the repository:
 
-**Release Build (optimized):**
-```bash
-dotnet build -c Release
-```
-Output: `bin/Release/VintageEssentials.zip`
-
-### Finding Your Vintage Story Installation
-
-**Windows:**
-- Default: `C:\Program Files\Vintagestory`
-- Steam: Right-click Vintage Story in Steam → Manage → Browse local files
-
-**Linux:**
-- System install: `/usr/share/vintagestory`
-- User install: `~/.local/share/Vintagestory`
-- Steam: `~/.steam/steam/steamapps/common/VintageStory`
-
-**macOS:**
-- Default: `~/Library/Application Support/Vintagestory`
-- Steam: `~/Library/Application Support/Steam/steamapps/common/VintageStory`
-
-### Testing Your Build
-
-1. Build the mod using one of the methods above
-2. Locate the generated `VintageEssentials.zip` file in `bin/Debug/` or `bin/Release/`
-3. Copy it to your Vintage Story mods folder:
-   - Windows: `%APPDATA%\VintagestoryData\Mods`
-   - Linux: `~/.config/VintagestoryData/Mods`
-   - macOS: `~/Library/Application Support/VintagestoryData/Mods`
-4. Launch Vintage Story
-5. Check the Mod Manager (Esc → Mod Manager) to verify the mod loaded successfully
-
-### Troubleshooting
-
-**Error: "Could not find a part of the path"**
-- The `VINTAGE_STORY` environment variable is not set correctly
-- Verify your Vintage Story installation path exists
-- Check that `VintagestoryAPI.dll` exists in that directory
-
-**Error: "The specified framework 'Microsoft.NETCore.App', version '7.0.0' was not found"**
-- Install .NET 7.0 SDK or later from https://dotnet.microsoft.com/download
-- Verify installation with `dotnet --version`
-
-**Build succeeds but mod doesn't work in-game:**
-- Ensure you copied the mod to the correct mods folder
-- Check the Vintage Story logs for errors (found in the `Logs` folder next to `Mods`)
-- Make sure you're using a compatible Vintage Story version (1.19.0 or later)
-
-## Usage
-
-### Setting and Using Home
-
-1. Navigate to where you want your home to be
-2. Type `/sethome` in chat
-3. Use `/home` anytime to teleport back
-
-### Random Teleport
-
-Use `/rtp` with a direction to explore:
-- `/rtp north` - Teleport 10,000-20,000 blocks north
-- `/rtp south` - Teleport 10,000-20,000 blocks south
-- `/rtp east` - Teleport 10,000-20,000 blocks east
-- `/rtp west` - Teleport 10,000-20,000 blocks west
-
-The mod will find a safe landing spot at ground level.
-
-### Chest Radius Inventory
-
-1. Stand near your storage area (chests within 15 blocks)
-2. Press `R` to open the Chest Radius Inventory
-3. Use the search box to find specific items
-4. Click "Sort" to toggle sorting by name (A-Z)
-5. **Shift-click** on items in the storage display to move them to your inventory
-6. Use "Deposit All" to move all items from your inventory to nearby chests (stacks with existing items first, then fills empty slots - just like normal game mechanics)
-7. Use "Take All" to retrieve items from chests to your inventory
-8. Scroll through the grid to see all available items
-
-### Sorting Your Inventory
-
-1. Press `Shift+S` to sort your player inventory by name (A-Z)
-2. Items will be organized alphabetically for easy access
-3. Your hotbar (slots 1-10) and offhand items will remain in place during sorting
-
-
-## Data Storage
-
-Home locations are saved persistently in the world save data and will survive server restarts.
-
-## Permissions
-
-All commands require the `chat` privilege, which all players have by default.
-
-## Development Documentation
-
-For developers and modders working with or learning from this project:
-
-- **[MODDING_GUIDELINES.md](MODDING_GUIDELINES.md)** - Comprehensive Vintage Story modding guidelines including:
-  - Asset system structure and organization
-  - JSON patching best practices (with important notes on case sensitivity and wildcards)
-  - Code modding patterns and ModSystem lifecycle
-  - Common issues and solutions
-  - Troubleshooting guide
-
-- **[ASSET_GENERATION.md](ASSET_GENERATION.md)** - Detailed asset creation guide covering:
-  - Texture creation and specifications
-  - 3D model creation with VS Model Creator
-  - Item and block asset structure
-  - Recipe creation for all types
-  - Sound asset integration
-  - Localization best practices
-
-These guides are based on official Vintage Story documentation, community best practices, and lessons learned from developing this mod.
-
-## Technical Notes
-
-### Stack Size Implementation
-
-This mod implements increased stack sizes (up to 1000) using **code-based asset patching** rather than JSON patches. This is the recommended approach when modifying many items at once because:
-
-- JSON patches don't support wildcards (can't use `game:itemtypes/*`)
-- Property names are case-sensitive in JSON (`maxstacksize` not `maxStackSize`)
-- Code patching is more maintainable and performant for bulk changes
-
-The implementation is in `VintageEssentialsModSystem.AssetsFinalize()`.
-
-### Storage Container Modifications
-
-Container slot changes (chests, storage vessels, crates) use JSON patches in `assets/vintageessentials/patches/blocktypes/storage.json`. Each container variant must be patched individually.
+- **[MODDING_GUIDELINES.md](MODDING_GUIDELINES.md)** — Comprehensive Vintage Story modding guidelines including asset system structure, JSON patching best practices, code modding patterns, and troubleshooting
+- **[ASSET_GENERATION.md](ASSET_GENERATION.md)** — Detailed asset creation guide covering textures, 3D models, items, blocks, recipes, sounds, and localization
 
 ## License
 
-See LICENSE file for details.
+See [LICENSE](LICENSE) file for details.
