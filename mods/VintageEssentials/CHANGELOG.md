@@ -5,6 +5,21 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 ## [Unreleased]
 
 ### Added
+- **Handbook Integration (Phase 4)** - Recipe browsing and auto-fill for Portable Crafting Table:
+  - "Handbook" button in the crafting table dialog opens the in-game handbook
+  - `HandbookIntegration` helper class with recipe lookup by output item
+  - `AutoFillRecipe()` method to automatically fill crafting grid from a selected recipe
+  - Ingredient availability checking before attempting auto-fill
+  - Crafting grid clearing with items returned to table storage
+
+- **Block Portability (Phase 5)** - Pick up and carry the Portable Crafting Table:
+  - Shift+right-click to pick up the crafting table block as an item
+  - All inventory contents (storage + crafting grid) preserved in the item stack
+  - Inventory automatically restored when the block is placed back down
+  - Block interaction help text showing pickup instructions
+  - `SaveInventoryToItemStack()` / `RestoreInventoryFromItemStack()` serialization methods
+  - `PreventDropOnRemoval` flag prevents double-dropping during pickup
+
 - **Portable Crafting Table (Phase 1)** - New placeable block with internal storage:
   - `BlockPortableCraftingTable` block class with interaction handling
   - `BlockEntityPortableCraftingTable` block entity with 72-slot (12×6) internal storage

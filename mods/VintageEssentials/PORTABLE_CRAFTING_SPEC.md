@@ -39,6 +39,21 @@ The Chest Radius Inventory (activated with R key) already has:
 - Pulls matching items from table storage first, then nearby containers
 - `RefillCraftingGrid()` helper to top up crafting grid stacks for repeat crafting
 
+### ✅ Phase 4: Handbook Integration (Complete)
+- "Handbook" button in crafting table dialog opens the game's handbook
+- `HandbookIntegration` helper class for recipe lookup and auto-fill
+- `AutoFillRecipe()` method to automatically fill crafting grid from a recipe
+- Ingredient availability checking before attempting auto-fill
+- Crafting grid clearing with items returned to table storage
+
+### ✅ Phase 5: Portability (Complete)
+- Shift+right-click to pick up the crafting table block
+- Inventory contents preserved in the item stack's tree attributes
+- Inventory restored when the block is placed back down
+- Block interaction help showing pickup instructions
+- `PreventDropOnRemoval` flag to avoid double-dropping items
+- `SaveInventoryToItemStack()` and `RestoreInventoryFromItemStack()` methods
+
 ### 🚧 To Be Implemented
 
 ## Feature Requirements
@@ -170,7 +185,7 @@ src/
 ├── BlockPortableCraftingTable.cs            (Block class) ✅
 ├── BlockEntityPortableCraftingTable.cs      (Block entity with inventory + crafting) ✅
 ├── CloudCraftingSystem.cs                   (Cloud crafting helpers) ✅
-└── HandbookIntegration.cs                   (Handbook API integration)
+└── HandbookIntegration.cs                   (Handbook API integration) ✅
 
 assets/vintageessentials/
 ├── blocktypes/
@@ -233,15 +248,16 @@ assets/vintageessentials/
 - ~~Auto-gather ingredients for manual crafts~~
 - ~~CloudCraftingSystem helper class~~
 
-### Phase 4: Handbook Integration
-- Add handbook button
-- Recipe selection from handbook
-- Auto-craft from selected recipe
+### Phase 4: Handbook Integration ✅
+- ~~Add handbook button~~
+- ~~Recipe selection from handbook~~
+- ~~Auto-craft from selected recipe~~
+- ~~Ingredient availability checking~~
 
-### Phase 5: Portability
-- Implement pickup with inventory preservation
-- Test with "Carry On" mod compatibility
-- Add visual indicators
+### Phase 5: Portability ✅
+- ~~Implement pickup with inventory preservation~~
+- ~~Test with "Carry On" mod compatibility~~
+- ~~Add visual indicators~~
 
 ### Phase 6: Polish & Testing
 - UI refinement

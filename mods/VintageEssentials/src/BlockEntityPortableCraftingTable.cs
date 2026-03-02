@@ -25,6 +25,12 @@ namespace VintageEssentials
         private InventoryGeneric inventory;
         private PortableCraftingTableDialog dialog;
 
+        /// <summary>
+        /// When true, prevents items from being dropped when the block is removed.
+        /// Used during pickup to preserve inventory in the item stack.
+        /// </summary>
+        public bool PreventDropOnRemoval { get; set; } = false;
+
         public override InventoryBase Inventory => inventory;
         public override string InventoryClassName => "portablecraftingtable";
 
@@ -275,6 +281,80 @@ namespace VintageEssentials
                     slot.MarkDirty();
                 }
             }
+        }
+
+        /// <summary>
+        /// Serializes the block entity's inventory into an item stack's tree attributes.
+        /// Used when the block is picked up to preserve its contents.
+        /// </summary>
+        public void SaveInventoryToItemStack(ItemStack itemStack)
+        {
+            if (itemStack == null || inventory == null) return;
+
+            ITreeAttribute invTree = new TreeAttribute();
+            int savedCount = STORAGE_SLOTS + CRAFT_GRID_SLOTS; // Don't save the virtual output slot
+
+            for (int i = 0; i < savedCount; i++)
+            {
+                ItemSlot slot = inventory[i];
+                if (slot != null && !slot.Empty)
+                {
+                    ITreeAttribute slotTree = new TreeAttribute();
+                    slot.Itemstack.ToTreeAttributes(slotTree);
+                    invTree["slot" + i] = slotTree;
+                }
+            }
+
+            invTree.SetInt("slotCount", savedCount);
+            itemStack.Attributes["craftingTableInventory"] = invTree;
+        }
+
+        /// <summary>
+        /// Restores the block entity's inventory from an item stack's tree attributes.
+        /// Used when a previously picked-up crafting table is placed back down.
+        /// </summary>
+        public void RestoreInventoryFromItemStack(ItemStack itemStack)
+        {
+            if (itemStack?.Attributes == null || inventory == null || Api == null) return;
+
+            ITreeAttribute invTree = itemStack.Attributes.GetTreeAttribute("craftingTableInventory");
+            if (invTree == null) return;
+
+            int savedCount = invTree.GetInt("slotCount", 0);
+            bool restoredSuccessfully = true;
+
+            for (int i = 0; i < savedCount && i < STORAGE_SLOTS + CRAFT_GRID_SLOTS; i++)
+            {
+                ITreeAttribute slotTree = invTree.GetTreeAttribute("slot" + i);
+                if (slotTree != null)
+                {
+                    try
+                    {
+                        ItemStack stack = new ItemStack();
+                        stack.FromTreeAttributes(slotTree, Api.World);
+                        stack.ResolveBlockOrItem(Api.World);
+
+                        if (stack.Collectible != null)
+                        {
+                            inventory[i].Itemstack = stack;
+                            inventory[i].MarkDirty();
+                        }
+                    }
+                    catch
+                    {
+                        restoredSuccessfully = false;
+                    }
+                }
+            }
+
+            // Only remove the inventory data if restoration completed successfully
+            if (restoredSuccessfully)
+            {
+                itemStack.Attributes.RemoveAttribute("craftingTableInventory");
+            }
+
+            // Update crafting output in case grid has items
+            UpdateCraftingOutput();
         }
 
         /// <summary>
