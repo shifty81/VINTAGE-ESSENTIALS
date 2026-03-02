@@ -24,6 +24,21 @@ The Chest Radius Inventory (activated with R key) already has:
 - Inventory persistence via NBT serialization
 - Block/entity class registration in mod system
 
+### ✅ Phase 2: Storage Integration (Complete)
+- 3×3 crafting grid with output slot added to the dialog
+- Crafting grid slots (9) and output slot (1) added to block entity inventory
+- Recipe matching logic scans all loaded `GridRecipe` entries
+- Placing items in the crafting grid automatically shows the output
+- Taking the output consumes one unit of each ingredient
+- Items transfer freely between storage, crafting grid, and player inventory
+
+### ✅ Phase 3: Cloud Crafting (Complete)
+- "Pull Ingredients" button in crafting table dialog
+- `CloudCraftingSystem` static helper scans nearby containers within 15 blocks
+- `GetNearbyContainerSlots()` on block entity for container discovery
+- Pulls matching items from table storage first, then nearby containers
+- `RefillCraftingGrid()` helper to top up crafting grid stacks for repeat crafting
+
 ### 🚧 To Be Implemented
 
 ## Feature Requirements
@@ -151,10 +166,10 @@ The Chest Radius Inventory (activated with R key) already has:
 New files to be created:
 ```
 src/
-├── PortableCraftingTableDialog.cs           (Main GUI)
-├── BlockPortableCraftingTable.cs            (Block class)
-├── BlockEntityPortableCraftingTable.cs      (Block entity with inventory)
-├── CloudCraftingSystem.cs                   (Crafting logic)
+├── PortableCraftingTableDialog.cs           (Main GUI) ✅
+├── BlockPortableCraftingTable.cs            (Block class) ✅
+├── BlockEntityPortableCraftingTable.cs      (Block entity with inventory + crafting) ✅
+├── CloudCraftingSystem.cs                   (Cloud crafting helpers) ✅
 └── HandbookIntegration.cs                   (Handbook API integration)
 
 assets/vintageessentials/
@@ -205,17 +220,18 @@ assets/vintageessentials/
 - ~~Create block and block entity~~
 - ~~Implement 72-slot internal storage~~
 - ~~Basic interaction (open GUI)~~
-- Simple crafting grid (standard 3x3) - deferred to Phase 2
+- ~~Simple crafting grid (standard 3x3)~~ - completed in Phase 2
 
-### Phase 2: Storage Integration
-- Display table's internal storage in GUI
-- Allow item transfer between storage and crafting grid
-- Implement scrolling for storage grid
+### Phase 2: Storage Integration ✅
+- ~~Display table's internal storage in GUI~~
+- ~~Allow item transfer between storage and crafting grid~~
+- ~~3×3 crafting grid with output slot and recipe matching~~
 
-### Phase 3: Cloud Crafting
-- Scan nearby containers for ingredients
-- Implement "Pull from Storage" functionality
-- Auto-gather ingredients for manual crafts
+### Phase 3: Cloud Crafting ✅
+- ~~Scan nearby containers for ingredients~~
+- ~~Implement "Pull from Storage" functionality~~
+- ~~Auto-gather ingredients for manual crafts~~
+- ~~CloudCraftingSystem helper class~~
 
 ### Phase 4: Handbook Integration
 - Add handbook button
