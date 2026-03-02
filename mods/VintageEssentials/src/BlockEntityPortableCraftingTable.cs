@@ -321,26 +321,37 @@ namespace VintageEssentials
             if (invTree == null) return;
 
             int savedCount = invTree.GetInt("slotCount", 0);
+            bool restoredSuccessfully = true;
 
             for (int i = 0; i < savedCount && i < STORAGE_SLOTS + CRAFT_GRID_SLOTS; i++)
             {
                 ITreeAttribute slotTree = invTree.GetTreeAttribute("slot" + i);
                 if (slotTree != null)
                 {
-                    ItemStack stack = new ItemStack();
-                    stack.FromTreeAttributes(slotTree, Api.World);
-                    stack.ResolveBlockOrItem(Api.World);
-
-                    if (stack.Collectible != null)
+                    try
                     {
-                        inventory[i].Itemstack = stack;
-                        inventory[i].MarkDirty();
+                        ItemStack stack = new ItemStack();
+                        stack.FromTreeAttributes(slotTree, Api.World);
+                        stack.ResolveBlockOrItem(Api.World);
+
+                        if (stack.Collectible != null)
+                        {
+                            inventory[i].Itemstack = stack;
+                            inventory[i].MarkDirty();
+                        }
+                    }
+                    catch
+                    {
+                        restoredSuccessfully = false;
                     }
                 }
             }
 
-            // Remove the inventory data from the item stack now that it's restored
-            itemStack.Attributes.RemoveAttribute("craftingTableInventory");
+            // Only remove the inventory data if restoration completed successfully
+            if (restoredSuccessfully)
+            {
+                itemStack.Attributes.RemoveAttribute("craftingTableInventory");
+            }
 
             // Update crafting output in case grid has items
             UpdateCraftingOutput();

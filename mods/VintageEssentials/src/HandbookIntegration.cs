@@ -200,12 +200,15 @@ namespace VintageEssentials
         }
 
         /// <summary>
-        /// Clears all items in the crafting grid, returning them to table storage
-        /// or dropping them if storage is full.
+        /// Clears all items in the crafting grid, returning them to table storage.
+        /// Returns true if all items were successfully moved, false if some items
+        /// remain in the grid because storage is full.
         /// </summary>
-        public void ClearCraftingGrid(BlockEntityPortableCraftingTable tableEntity)
+        public bool ClearCraftingGrid(BlockEntityPortableCraftingTable tableEntity)
         {
-            if (tableEntity == null) return;
+            if (tableEntity == null) return true;
+
+            bool allMoved = true;
 
             for (int i = 0; i < BlockEntityPortableCraftingTable.CRAFT_GRID_SLOTS; i++)
             {
@@ -213,23 +216,18 @@ namespace VintageEssentials
                 if (gridSlot == null || gridSlot.Empty) continue;
 
                 // Try to move items back to table storage
-                bool moved = false;
                 for (int s = tableEntity.StorageSlotStart; s < tableEntity.StorageSlotStart + tableEntity.StorageSlotCount; s++)
                 {
                     ItemSlot storageSlot = tableEntity.Inventory[s];
                     if (storageSlot == null) continue;
 
-                    int movedQty = gridSlot.TryPutInto(capi.World, storageSlot);
-                    if (gridSlot.Empty)
-                    {
-                        moved = true;
-                        break;
-                    }
+                    gridSlot.TryPutInto(capi.World, storageSlot);
+                    if (gridSlot.Empty) break;
                 }
 
-                if (!moved && !gridSlot.Empty)
+                if (!gridSlot.Empty)
                 {
-                    // Couldn't fit in storage, leave in grid (items won't be lost)
+                    allMoved = false;
                     gridSlot.MarkDirty();
                 }
             }
@@ -241,6 +239,8 @@ namespace VintageEssentials
                 outputSlot.Itemstack = null;
                 outputSlot.MarkDirty();
             }
+
+            return allMoved;
         }
 
         /// <summary>
