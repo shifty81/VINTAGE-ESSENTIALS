@@ -98,21 +98,21 @@ namespace VintageEssentials
             // Slots 0-71 = storage, 72-80 = crafting grid, 81 = output
             SingleComposer = capi.Gui.CreateCompo("portablecraftingtable" + blockEntity.Pos, dialogBounds)
                 .AddShadedDialogBG(bgBounds)
-                .AddDialogTitleBar("Portable Crafting Table", OnTitleBarClose)
+                .AddDialogTitleBar(Lang.Get("vintageessentials:crafttable-title"), OnTitleBarClose)
                 .BeginChildElements(bgBounds)
                     // Crafting section
-                    .AddStaticText("Crafting Grid:", CairoFont.WhiteDetailText(), craftLabelBounds)
+                    .AddStaticText(Lang.Get("vintageessentials:crafttable-craftgrid"), CairoFont.WhiteDetailText(), craftLabelBounds)
                     .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, CRAFT_GRID_SIZE, craftGridBounds, "craftGrid")
                     .AddStaticText("→", CairoFont.WhiteDetailText().WithFontSize(24), arrowBounds)
                     .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, 1, outputSlotBounds, "outputSlot")
-                    .AddSmallButton("Pull Ingredients", OnPullFromStorage, pullBtnBounds, EnumButtonStyle.Normal, "pullBtn")
+                    .AddSmallButton(Lang.Get("vintageessentials:crafttable-pull"), OnPullFromStorage, pullBtnBounds, EnumButtonStyle.Normal, "pullBtn")
 
                     // Storage section
-                    .AddStaticText("Table Storage:", CairoFont.WhiteDetailText(), storageLabelBounds)
+                    .AddStaticText(Lang.Get("vintageessentials:crafttable-storage"), CairoFont.WhiteDetailText(), storageLabelBounds)
                     .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, STORAGE_COLS, storageSlotBounds, "storageSlots")
 
                     // Player inventory
-                    .AddStaticText("Player Inventory:", CairoFont.WhiteDetailText(), playerLabelBounds)
+                    .AddStaticText(Lang.Get("vintageessentials:crafttable-playerinv"), CairoFont.WhiteDetailText(), playerLabelBounds)
                     .AddItemSlotGrid(playerInv, SendInvPacket, 10, playerHotbarBounds, "playerHotbar")
                     .AddItemSlotGrid(playerInv, SendInvPacket, 10, playerBackpackBounds, "playerBackpack")
                 .EndChildElements()
@@ -149,11 +149,11 @@ namespace VintageEssentials
 
             if (filled > 0)
             {
-                capi.ShowChatMessage($"Pulled {filled} items from storage");
+                capi.ShowChatMessage(Lang.Get("vintageessentials:crafttable-pulled", filled));
             }
             else
             {
-                capi.ShowChatMessage("No matching items found in storage or nearby containers");
+                capi.ShowChatMessage(Lang.Get("vintageessentials:crafttable-nopull"));
             }
 
             return true;
