@@ -54,7 +54,9 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 - **3×3 crafting grid** with recipe output slot — place ingredients to see the result
 - **Cloud Crafting** — "Pull Ingredients" button gathers items from nearby containers (15-block radius)
 - Search order: crafting grid → table's own storage → nearby containers
-- Items persist in the table's inventory
+- **Handbook Integration** — "Handbook" button opens the in-game handbook for recipe browsing
+- **Portable** — Shift+right-click to pick up the table with all its contents preserved
+- Items persist in the table's inventory through pickup/place cycles
 - Items drop when the block is broken
 - Crafted from: 6 planks + 2 sticks + 1 iron ingot
 

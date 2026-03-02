@@ -72,5 +72,11 @@
   "vintageessentials:crafttable-playerinv": "Player Inventory:",
   "vintageessentials:crafttable-pull": "Pull Ingredients",
   "vintageessentials:crafttable-pulled": "Pulled {0} items from storage",
-  "vintageessentials:crafttable-nopull": "No matching items found in storage or nearby containers"
+  "vintageessentials:crafttable-nopull": "No matching items found in storage or nearby containers",
+  "vintageessentials:crafttable-handbook": "Handbook",
+  "vintageessentials:crafttable-pickup-help": "Shift+Right-click to pick up",
+  "vintageessentials:crafttable-pickedup": "Crafting table picked up with contents",
+  "vintageessentials:crafttable-placed": "Crafting table placed with restored contents",
+  "vintageessentials:crafttable-autofill-success": "Auto-filled {0} ingredients from storage",
+  "vintageessentials:crafttable-autofill-missing": "Missing ingredients - not all items available in storage or nearby containers"
 }

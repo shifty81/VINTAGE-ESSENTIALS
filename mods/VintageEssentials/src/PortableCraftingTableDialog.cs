@@ -11,13 +11,15 @@ namespace VintageEssentials
     /// <summary>
     /// GUI dialog for the Portable Crafting Table.
     /// Displays a 3x3 crafting grid with output slot, the table's internal 72-slot
-    /// storage grid, a "Pull from Storage" button, and the player inventory.
+    /// storage grid, "Pull from Storage" and "Handbook" buttons, and the player inventory.
     /// Phase 2: Crafting grid + storage integration.
     /// Phase 3: Cloud crafting (pull ingredients from nearby containers).
+    /// Phase 4: Handbook integration (open handbook, auto-fill recipes).
     /// </summary>
     public class PortableCraftingTableDialog : GuiDialogBlockEntity
     {
         private BlockEntityPortableCraftingTable blockEntity;
+        private HandbookIntegration handbookIntegration;
         private const int STORAGE_COLS = 12;
         private const int STORAGE_ROWS = 6;
         private const int CRAFT_GRID_SIZE = 3;
@@ -27,6 +29,7 @@ namespace VintageEssentials
             : base("Portable Crafting Table", blockEntity.Inventory, blockEntity.Pos, capi)
         {
             this.blockEntity = blockEntity;
+            this.handbookIntegration = new HandbookIntegration(capi);
             ComposeDialog();
         }
 
@@ -64,6 +67,10 @@ namespace VintageEssentials
             double pullBtnX = outputX + slotSize + pad;
             ElementBounds pullBtnBounds = ElementBounds.Fixed(pullBtnX, yOffset + slotSize - 5, 170, 30);
 
+            // ---- "Handbook" button ----
+            double handbookBtnX = pullBtnX;
+            ElementBounds handbookBtnBounds = ElementBounds.Fixed(handbookBtnX, yOffset + slotSize + 30, 170, 30);
+
             double craftSectionHeight = CRAFT_GRID_SIZE * slotSize;
             yOffset += craftSectionHeight + pad;
 
@@ -88,7 +95,7 @@ namespace VintageEssentials
 
             bgBounds.BothSizing = ElementSizing.FitToChildren;
             bgBounds.WithChildren(craftLabelBounds, craftGridBounds, arrowBounds, outputSlotBounds,
-                                  pullBtnBounds, storageLabelBounds, storageSlotBounds,
+                                  pullBtnBounds, handbookBtnBounds, storageLabelBounds, storageSlotBounds,
                                   playerLabelBounds, playerHotbarBounds, playerBackpackBounds);
 
             // Get the player's own inventory for display
@@ -106,6 +113,7 @@ namespace VintageEssentials
                     .AddStaticText("→", CairoFont.WhiteDetailText().WithFontSize(24), arrowBounds)
                     .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, 1, outputSlotBounds, "outputSlot")
                     .AddSmallButton(Lang.Get("vintageessentials:crafttable-pull"), OnPullFromStorage, pullBtnBounds, EnumButtonStyle.Normal, "pullBtn")
+                    .AddSmallButton(Lang.Get("vintageessentials:crafttable-handbook"), OnOpenHandbook, handbookBtnBounds, EnumButtonStyle.Normal, "handbookBtn")
 
                     // Storage section
                     .AddStaticText(Lang.Get("vintageessentials:crafttable-storage"), CairoFont.WhiteDetailText(), storageLabelBounds)
@@ -117,6 +125,17 @@ namespace VintageEssentials
                     .AddItemSlotGrid(playerInv, SendInvPacket, 10, playerBackpackBounds, "playerBackpack")
                 .EndChildElements()
                 .Compose();
+        }
+
+        /// <summary>
+        /// Opens the in-game handbook dialog for recipe browsing.
+        /// </summary>
+        private bool OnOpenHandbook()
+        {
+            if (handbookIntegration == null) return true;
+
+            handbookIntegration.OpenHandbook();
+            return true;
         }
 
         /// <summary>
