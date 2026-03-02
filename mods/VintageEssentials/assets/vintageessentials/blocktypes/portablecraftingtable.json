@@ -1,0 +1,54 @@
+{
+  "code": "portablecraftingtable",
+  "class": "VintageEssentials.BlockPortableCraftingTable",
+  "entityClass": "VintageEssentials.BlockEntityPortableCraftingTable",
+  "maxstacksize": 1,
+  "creativeinventory": {
+    "general": ["*"],
+    "construction": ["*"]
+  },
+  "blockmaterial": "Wood",
+  "drawtype": "JSON",
+  "resistance": 2.5,
+  "lightAbsorption": 0,
+  "shape": {
+    "base": "vintageessentials:block/portablecraftingtable"
+  },
+  "textures": {
+    "wood": { "base": "block/wood/planks/oak" },
+    "metal": { "base": "block/metal/ingot/iron" }
+  },
+  "sounds": {
+    "place": "game:block/planks",
+    "break": "game:block/planks",
+    "walk": "game:block/planks"
+  },
+  "sidesolid": {
+    "all": false
+  },
+  "sideopaque": {
+    "all": false
+  },
+  "attributes": {
+    "quantitySlots": 72,
+    "dialogTitleLangCode": "block-portablecraftingtable"
+  },
+  "guiTransform": {
+    "translation": { "x": 0, "y": -1, "z": 0 },
+    "rotation": { "x": -22.6, "y": -45, "z": 0 },
+    "origin": { "x": 0.5, "y": 0.3, "z": 0.5 },
+    "scale": 1.5
+  },
+  "tpHandTransform": {
+    "translation": { "x": -0.87, "y": -0.15, "z": -0.56 },
+    "rotation": { "x": 0, "y": 0, "z": 0 },
+    "origin": { "x": 0.5, "y": 0.1, "z": 0.5 },
+    "scale": 0.5
+  },
+  "groundTransform": {
+    "translation": { "x": 0, "y": 0, "z": 0 },
+    "rotation": { "x": 0, "y": 0, "z": 0 },
+    "origin": { "x": 0.5, "y": 0, "z": 0.5 },
+    "scale": 3.0
+  }
+}

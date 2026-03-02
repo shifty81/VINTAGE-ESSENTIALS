@@ -1,0 +1,68 @@
+{
+  "vintageessentials:modname": "Vintage Essentials",
+  "vintageessentials:moddesc": "Essential commands and quality of life improvements",
+
+  "vintageessentials:chestradius-title": "Nearby Chests (15 block radius)",
+  "vintageessentials:chestradius-search": "Search items...",
+  "vintageessentials:chestradius-sort": "Sort",
+  "vintageessentials:chestradius-deposit": "Deposit All",
+  "vintageessentials:chestradius-takeall": "Take All",
+  "vintageessentials:chestradius-close": "Close",
+  "vintageessentials:chestradius-found": "Found {0} containers with {1} items",
+  "vintageessentials:chestradius-deposited": "Deposited {0} items",
+  "vintageessentials:chestradius-taken": "Took {0} items",
+  "vintageessentials:chestradius-sorting-on": "Sorting enabled (A-Z)",
+  "vintageessentials:chestradius-sorting-off": "Sorting disabled",
+
+  "vintageessentials:sort-noitems": "No items to sort!",
+  "vintageessentials:sort-done": "Inventory sorted by name (A-Z) - Hotbar and offhand preserved",
+
+  "vintageessentials:lock-enabled": "Slot locking mode ENABLED. Click inventory slots to lock them. ({0}/{1} locked)",
+  "vintageessentials:lock-disabled": "Slot locking mode DISABLED.",
+  "vintageessentials:lock-slot-locked": "Slot {0} locked.",
+  "vintageessentials:lock-slot-unlocked": "Slot {0} unlocked.",
+  "vintageessentials:lock-max-reached": "Cannot lock more slots. Maximum is {0}.",
+  "vintageessentials:lock-mode-on": "Locking mode ON - Click inventory slots to lock/unlock them",
+  "vintageessentials:lock-mode-off": "Locking mode OFF",
+
+  "vintageessentials:config-title": "VintageEssentials Settings",
+  "vintageessentials:config-maxslots": "Max Locked Slots:",
+  "vintageessentials:config-stackmult": "Stack Size Multiplier:",
+  "vintageessentials:config-stackinfo": "Applies to items that initially stack ≤10\n(Requires game restart to take effect)",
+  "vintageessentials:config-keybinds": "Keybinds:",
+  "vintageessentials:config-save": "Save",
+  "vintageessentials:config-cancel": "Cancel",
+  "vintageessentials:config-saved": "Settings saved! Stack size changes require a game restart to take effect.",
+  "vintageessentials:config-keybindset": "Keybind set to: {0}",
+  "vintageessentials:config-keybindcancelled": "Keybind change cancelled",
+  "vintageessentials:config-presskey": "Press any key combination for {0} (press Escape to cancel)",
+  "vintageessentials:config-keybindsupdated": "Keybinds updated!",
+  "vintageessentials:config-change": "Change",
+  "vintageessentials:config-presskey-btn": "Press key...",
+
+  "vintageessentials:conflict-title": "Keybind Conflict ({0}/{1})",
+  "vintageessentials:conflict-header": "VintageEssentials Keybind Conflict",
+  "vintageessentials:conflict-message": "{0}\n\nConflict detected with: {1}\n\nYou can change this keybind to avoid the conflict.",
+  "vintageessentials:conflict-accept": "Accept",
+  "vintageessentials:conflict-skip": "Skip",
+  "vintageessentials:conflict-skipall": "Skip All",
+  "vintageessentials:conflict-changekey": "Change Key",
+  "vintageessentials:conflict-presskey": "Press any key combination (you can use Ctrl, Shift, Alt modifiers)",
+  "vintageessentials:conflict-changed": "Keybind changed to: {0}",
+
+  "vintageessentials:feature-chestradius": "Chest Radius Inventory - Opens a dialog showing all items in chests within 15 blocks. Allows quick searching and management.",
+  "vintageessentials:feature-sort": "Player Inventory Sort - Sorts your inventory alphabetically, keeping locked slots in place.",
+  "vintageessentials:feature-lock": "Toggle Slot Locking - Enables/disables locking mode. When active, click slots to lock/unlock them.",
+  "vintageessentials:feature-config": "VintageEssentials Settings - Opens the mod configuration dialog.",
+
+  "vintageessentials:keybind-chestradius": "Open Chest Radius Inventory",
+  "vintageessentials:keybind-sort": "Sort Player Inventory",
+  "vintageessentials:keybind-lock": "Toggle Inventory Slot Locking Mode",
+  "vintageessentials:keybind-config": "Open VintageEssentials Settings",
+
+  "vintageessentials:loaded": "VintageEssentials loaded! Press Ctrl+Shift+V to open settings or use /veconfig",
+
+  "block-portablecraftingtable": "Portable Crafting Table",
+  "blockdesc-portablecraftingtable": "A portable crafting station with internal storage that can access items from nearby containers.",
+  "blockhelp-portablecraftingtable-rightclick": "Open crafting interface"
+}

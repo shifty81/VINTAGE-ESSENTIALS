@@ -5,7 +5,9 @@ using Vintagestory.API.Common;
 namespace VintageEssentials
 {
     /// <summary>
-    /// Handles inventory slot click events for the locking system
+    /// Handles inventory slot click events for the locking system.
+    /// When locking mode is active, clicking on an inventory slot toggles its lock state
+    /// instead of performing the normal item interaction.
     /// </summary>
     public class InventorySlotClickHandler
     {
@@ -22,10 +24,6 @@ namespace VintageEssentials
 
         public void Initialize()
         {
-            // Hook into the inventory slot click events
-            // In Vintage Story, this is done through the GuiElementItemSlotGrid
-            // We need to override the default click behavior when in locking mode
-            
             capi.Event.MouseDown += OnMouseDown;
         }
 
@@ -39,8 +37,6 @@ namespace VintageEssentials
             if (playerInv == null) return;
 
             // Try to determine which slot was clicked
-            // This is a simplified approach - in reality, you'd need to check the actual slot bounds
-            // from the inventory GUI
             int? clickedSlotId = DetermineClickedSlot(e);
             
             if (clickedSlotId.HasValue)
@@ -54,14 +50,78 @@ namespace VintageEssentials
 
         private int? DetermineClickedSlot(MouseEvent e)
         {
-            // This is a placeholder implementation
-            // In a full implementation, you would:
-            // 1. Get the character/inventory dialog
-            // 2. Get the slot grid element
-            // 3. Check which slot bounds contain the mouse position
-            // 4. Return the slot ID
-            
-            // For now, we return null as this requires deep integration with the GUI system
+            // Search through all open GUIs to find the character/inventory dialog
+            foreach (var gui in capi.Gui.OpenedGuis)
+            {
+                if (gui is GuiDialog guiDialog)
+                {
+                    string toggleKey = guiDialog.ToggleKeyCombinationCode;
+                    if (toggleKey == null) continue;
+                    
+                    // Look for the character dialog (inventory screen)
+                    if (!toggleKey.Contains("character") && !toggleKey.Contains("inventory")) continue;
+
+                    // Access the dialog's composer to find slot grid elements
+                    var composer = guiDialog.SingleComposer;
+                    if (composer == null) continue;
+
+                    // Walk through inventory slots and check if the click position
+                    // falls within any slot's rendered bounds
+                    IInventory playerInv = capi.World.Player?.InventoryManager?.GetOwnInventory(GlobalConstants.characterInvClassName);
+                    if (playerInv == null) return null;
+
+                    int mouseX = e.X;
+                    int mouseY = e.Y;
+
+                    // Try to find the slot grid element by checking interactive elements
+                    // The slot grid stores slot bounds internally
+                    var interactiveElement = composer.GetSlotGrid("inventory");
+                    if (interactiveElement != null)
+                    {
+                        // Use the slot grid to determine which slot index was clicked
+                        // by checking each slot's rendered bounds against the mouse position
+                        for (int slotId = 0; slotId < playerInv.Count; slotId++)
+                        {
+                            // GuiElementItemSlotGrid provides slot bounds through its API
+                            // Check if mouse position is within this slot's area
+                            var slotBounds = interactiveElement.SlotBounds;
+                            if (slotBounds != null && slotId < slotBounds.Length)
+                            {
+                                var bounds = slotBounds[slotId];
+                                if (bounds != null &&
+                                    mouseX >= bounds.renderX && mouseX <= bounds.renderX + bounds.OuterWidth &&
+                                    mouseY >= bounds.renderY && mouseY <= bounds.renderY + bounds.OuterHeight)
+                                {
+                                    return slotId;
+                                }
+                            }
+                        }
+                    }
+
+                    // Fallback: try common slot grid key names
+                    string[] gridKeys = { "inventoryslots", "invslots", "slotgrid", "playerinvslots" };
+                    foreach (string key in gridKeys)
+                    {
+                        var grid = composer.GetSlotGrid(key);
+                        if (grid == null) continue;
+
+                        var slotBounds = grid.SlotBounds;
+                        if (slotBounds == null) continue;
+
+                        for (int slotId = 0; slotId < slotBounds.Length && slotId < playerInv.Count; slotId++)
+                        {
+                            var bounds = slotBounds[slotId];
+                            if (bounds != null &&
+                                mouseX >= bounds.renderX && mouseX <= bounds.renderX + bounds.OuterWidth &&
+                                mouseY >= bounds.renderY && mouseY <= bounds.renderY + bounds.OuterHeight)
+                            {
+                                return slotId;
+                            }
+                        }
+                    }
+                }
+            }
+
             return null;
         }
 

@@ -1,0 +1,28 @@
+{
+  "ingredientPattern": "PPP,SIS,PPP",
+  "ingredients": {
+    "P": {
+      "type": "block",
+      "code": "game:planks-*",
+      "allowedVariants": ["oak", "birch", "pine", "acacia", "kapok", "maple", "walnut", "aged"],
+      "quantity": 1
+    },
+    "S": {
+      "type": "item",
+      "code": "game:stick",
+      "quantity": 1
+    },
+    "I": {
+      "type": "item",
+      "code": "game:ingot-iron",
+      "quantity": 1
+    }
+  },
+  "width": 3,
+  "height": 3,
+  "output": {
+    "type": "block",
+    "code": "vintageessentials:portablecraftingtable",
+    "quantity": 1
+  }
+}

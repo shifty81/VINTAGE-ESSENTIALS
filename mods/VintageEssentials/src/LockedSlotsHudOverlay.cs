@@ -78,30 +78,42 @@ namespace VintageEssentials
 
         private void RenderLockedSlots(HashSet<int> lockedSlots, GuiDialog invDialog)
         {
-            // This is a simplified implementation
-            // In a real implementation, you would need to:
-            // 1. Get the exact position and size of each inventory slot from the dialog
-            // 2. Calculate the screen position for each locked slot
-            // 3. Render the overlay texture at those positions
+            // Access the dialog's composer to find slot grid elements
+            var composer = invDialog.SingleComposer;
+            if (composer == null) return;
+
+            // Try common slot grid element key names used in the character dialog
+            string[] gridKeys = { "inventory", "inventoryslots", "invslots", "slotgrid", "playerinvslots" };
             
-            // For now, we'll just add a note that the visual overlay requires
-            // more deep integration with the inventory system
-            
-            // Example of how it would work:
-            // foreach (int slotId in lockedSlots)
-            // {
-            //     var slotBounds = GetSlotBounds(invDialog, slotId);
-            //     if (slotBounds != null)
-            //     {
-            //         capi.Render.Render2DTexture(
-            //             lockedSlotTexture.TextureId,
-            //             slotBounds.renderX,
-            //             slotBounds.renderY,
-            //             slotBounds.OuterWidth,
-            //             slotBounds.OuterHeight
-            //         );
-            //     }
-            // }
+            foreach (string key in gridKeys)
+            {
+                var grid = composer.GetSlotGrid(key);
+                if (grid == null) continue;
+
+                var slotBounds = grid.SlotBounds;
+                if (slotBounds == null) continue;
+
+                foreach (int slotId in lockedSlots)
+                {
+                    if (slotId >= 0 && slotId < slotBounds.Length)
+                    {
+                        var bounds = slotBounds[slotId];
+                        if (bounds != null && lockedSlotTexture != null)
+                        {
+                            capi.Render.Render2DTexture(
+                                lockedSlotTexture.TextureId,
+                                (float)bounds.renderX,
+                                (float)bounds.renderY,
+                                (float)bounds.OuterWidth,
+                                (float)bounds.OuterHeight
+                            );
+                        }
+                    }
+                }
+
+                // Found a matching grid, no need to try other keys
+                return;
+            }
         }
 
         public override void Dispose()

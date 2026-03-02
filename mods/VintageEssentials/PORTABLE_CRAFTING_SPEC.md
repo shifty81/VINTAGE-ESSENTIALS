@@ -14,6 +14,16 @@ The Chest Radius Inventory (activated with R key) already has:
 - **15 block radius** - Scans for nearby containers within this range
 - **Deposit/Take All** - Bulk transfer functionality
 
+### ✅ Phase 1: Basic Portable Crafting Table Block (Complete)
+- `BlockPortableCraftingTable` class with interaction and block removal handling
+- `BlockEntityPortableCraftingTable` with 72-slot (12×6) internal storage
+- `PortableCraftingTableDialog` GUI showing table storage and player inventory
+- Block type JSON definition with 3D model shape
+- Crafting recipe (6 planks + 2 sticks + 1 iron ingot)
+- Item drop on block removal
+- Inventory persistence via NBT serialization
+- Block/entity class registration in mod system
+
 ### 🚧 To Be Implemented
 
 ## Feature Requirements
@@ -191,11 +201,11 @@ assets/vintageessentials/
 
 ## Implementation Phases
 
-### Phase 1: Basic Portable Crafting Table Block
-- Create block and block entity
-- Implement 72-slot internal storage
-- Basic interaction (open GUI)
-- Simple crafting grid (standard 3x3)
+### Phase 1: Basic Portable Crafting Table Block ✅
+- ~~Create block and block entity~~
+- ~~Implement 72-slot internal storage~~
+- ~~Basic interaction (open GUI)~~
+- Simple crafting grid (standard 3x3) - deferred to Phase 2
 
 ### Phase 2: Storage Integration
 - Display table's internal storage in GUI
