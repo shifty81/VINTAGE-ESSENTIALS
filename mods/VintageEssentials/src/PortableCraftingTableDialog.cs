@@ -41,11 +41,15 @@ namespace VintageEssentials
             double storageHeight = STORAGE_ROWS * slotSize;
             ElementBounds playerLabelBounds = ElementBounds.Fixed(0, storageHeight + 65, elemWidth, 20);
 
-            // Player inventory
-            ElementBounds playerInvBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 0, storageHeight + 90, 10, 4);
+            // Player inventory (hotbar: 10 slots in 1 row, backpack: 10x3 grid)
+            ElementBounds playerHotbarBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 0, storageHeight + 90, 10, 1);
+            ElementBounds playerBackpackBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 0, storageHeight + 90 + slotSize + 10, 10, 3);
 
             bgBounds.BothSizing = ElementSizing.FitToChildren;
-            bgBounds.WithChildren(storageLabelBounds, storageSlotBounds, playerLabelBounds, playerInvBounds);
+            bgBounds.WithChildren(storageLabelBounds, storageSlotBounds, playerLabelBounds, playerHotbarBounds, playerBackpackBounds);
+
+            // Get the player's own inventory for display
+            IInventory playerInv = capi.World.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
 
             SingleComposer = capi.Gui.CreateCompo("portablecraftingtable" + blockEntity.Pos, dialogBounds)
                 .AddShadedDialogBG(bgBounds)
@@ -54,7 +58,8 @@ namespace VintageEssentials
                     .AddStaticText("Table Storage:", CairoFont.WhiteDetailText(), storageLabelBounds)
                     .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, STORAGE_COLS, storageSlotBounds, "storageSlots")
                     .AddStaticText("Player Inventory:", CairoFont.WhiteDetailText(), playerLabelBounds)
-                    .AddInset(playerInvBounds, 3)
+                    .AddItemSlotGrid(playerInv, SendInvPacket, 10, playerHotbarBounds, "playerHotbar")
+                    .AddItemSlotGrid(playerInv, SendInvPacket, 10, playerBackpackBounds, "playerBackpack")
                 .EndChildElements()
                 .Compose();
         }

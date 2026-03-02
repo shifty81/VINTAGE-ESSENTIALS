@@ -23,6 +23,11 @@ namespace VintageEssentials
         public override InventoryBase Inventory => storageInventory;
         public override string InventoryClassName => "portablecraftingtable";
 
+        private string GetInventoryId()
+        {
+            return InventoryClassName + "-" + Pos?.ToString();
+        }
+
         public BlockEntityPortableCraftingTable()
         {
         }
@@ -31,7 +36,7 @@ namespace VintageEssentials
         {
             if (storageInventory == null)
             {
-                storageInventory = new InventoryGeneric(TOTAL_SLOTS, InventoryClassName + "-" + Pos?.ToString(), api);
+                storageInventory = new InventoryGeneric(TOTAL_SLOTS, GetInventoryId(), api);
             }
 
             base.Initialize(api);
@@ -95,7 +100,7 @@ namespace VintageEssentials
         {
             if (storageInventory == null)
             {
-                storageInventory = new InventoryGeneric(TOTAL_SLOTS, InventoryClassName + "-" + Pos?.ToString(), worldForResolving.Api);
+                storageInventory = new InventoryGeneric(TOTAL_SLOTS, GetInventoryId(), worldForResolving.Api);
             }
             
             base.FromTreeAttributes(tree, worldForResolving);
