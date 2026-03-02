@@ -5,6 +5,20 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 ## [Unreleased]
 
 ### Added
+- **Portable Crafting Table (Phase 1)** - New placeable block with internal storage:
+  - `BlockPortableCraftingTable` block class with interaction handling
+  - `BlockEntityPortableCraftingTable` block entity with 72-slot (12×6) internal storage
+  - `PortableCraftingTableDialog` GUI showing table storage and player inventory
+  - Block type JSON definition with 3D model and crafting recipe
+  - Recipe: 6 planks + 2 sticks + 1 iron ingot
+  - Items drop when block is broken
+  - Inventory persists via NBT serialization
+
+- **Localization** - Added English language file (`assets/vintageessentials/lang/en.json`):
+  - All UI strings for chest radius inventory, sorting, slot locking, and configuration dialogs
+  - Portable crafting table block name and description
+  - Keybind conflict resolution strings
+
 - **Keybind Customization System** - Full GUI-based keybind configuration:
   - All keybinds can now be customized directly from the mod settings dialog
   - No need to go to game Options > Controls menu
@@ -44,6 +58,21 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
   - Localization best practices
 
 ### Fixed
+- **Player Inventory Sort** - Fixed two compilation bugs:
+  - Removed duplicate `int slotIndex = 0;` variable declaration
+  - Fixed undefined `lockedSlots` variable to properly retrieve locked slots from `LockedSlotsManager` using the player's UID
+
+- **Inventory Slot Click Handler** - Implemented `DetermineClickedSlot()`:
+  - Was a placeholder that always returned null, preventing slot locking from working
+  - Now searches through open GUI dialogs to find the character/inventory dialog
+  - Accesses slot grid elements and checks slot bounds against mouse position
+  - Supports multiple common slot grid element key names for compatibility
+
+- **Locked Slots HUD Overlay** - Implemented `RenderLockedSlots()`:
+  - Was commented-out placeholder code with no functional rendering
+  - Now renders yellow diagonal stripe overlay textures at actual slot positions
+  - Uses the dialog composer's slot grid bounds for accurate positioning
+
 - **Stack Size Implementation** - Migrated from broken JSON patches to proper code-based patching:
   - **Issue**: Previous implementation used wildcards in JSON patches (`game:itemtypes/*`) which are NOT supported by Vintage Story
   - **Issue**: Property name was case-sensitive (`maxstacksize` not `maxStackSize`)

@@ -20,6 +20,10 @@ namespace VintageEssentials
         {
             base.Start(api);
             
+            // Register block and block entity classes
+            api.RegisterBlockClass("VintageEssentials.BlockPortableCraftingTable", typeof(BlockPortableCraftingTable));
+            api.RegisterBlockEntityClass("VintageEssentials.BlockEntityPortableCraftingTable", typeof(BlockEntityPortableCraftingTable));
+            
             // Patch all collectibles to have increased stack sizes
             api.World.Logger.Event("VintageEssentials: Applying stack size patches...");
         }

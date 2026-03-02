@@ -9,7 +9,7 @@ VINTAGE-ESSENTIALS/
 ├── mods/
 │   └── VintageEssentials/      # Our first mod — quality of life improvements
 │       ├── src/                 # C# source code
-│       ├── assets/              # Game assets (patches, shapes, textures, etc.)
+│       ├── assets/              # Game assets (patches, shapes, lang, etc.)
 │       ├── modinfo.json         # Mod metadata
 │       ├── VintageEssentials.csproj  # Build project
 │       ├── CHANGELOG.md         # Mod-specific changelog
@@ -24,7 +24,7 @@ VINTAGE-ESSENTIALS/
 
 | Mod | Description | Folder |
 |-----|-------------|--------|
-| [Vintage Essentials](mods/VintageEssentials/) | Essential commands and quality of life improvements including `/home`, `/sethome`, `/rtp`, chest radius inventory, inventory sorting, slot locking, and configurable stack sizes | `mods/VintageEssentials/` |
+| [Vintage Essentials](mods/VintageEssentials/) | Essential commands and quality of life improvements including `/home`, `/sethome`, `/rtp`, chest radius inventory, inventory sorting, slot locking, configurable stack sizes, and portable crafting table | `mods/VintageEssentials/` |
 
 ## Working on a Mod
 

@@ -47,6 +47,15 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 - **Direct conflict resolution** - Change conflicting keybinds immediately when prompted
 - All settings are saved globally and persist across game sessions
 
+### Portable Crafting Table (NEW!)
+
+- **Placeable block** with a 72-slot (12×6) internal storage grid
+- Right-click to open the crafting interface with storage access
+- Items persist in the table's inventory
+- Items drop when the block is broken
+- Crafted from: 6 planks + 2 sticks + 1 iron ingot
+- Foundation for future cloud crafting functionality (pulling ingredients from nearby containers)
+
 ### Stack Size Increases
 
 - **Configurable stack sizes** - Use the slider in mod settings to adjust the multiplier (default 100x)
