@@ -24,7 +24,7 @@ VINTAGE-ESSENTIALS/
 
 | Mod | Description | Folder |
 |-----|-------------|--------|
-| [Vintage Essentials](mods/VintageEssentials/) | Essential commands and quality of life improvements including `/home`, `/sethome`, `/rtp`, chest radius inventory, inventory sorting, slot locking, configurable stack sizes, and portable crafting table | `mods/VintageEssentials/` |
+| [Vintage Essentials](mods/VintageEssentials/) | Essential commands and quality of life improvements including `/home`, `/sethome`, `/rtp`, chest radius inventory, inventory sorting, slot locking, configurable stack sizes, and portable crafting table with cloud crafting | `mods/VintageEssentials/` |
 
 ## Working on a Mod
 

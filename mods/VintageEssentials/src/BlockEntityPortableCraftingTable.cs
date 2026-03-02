@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Vintagestory.API.Common;
 using Vintagestory.API.Client;
 using Vintagestory.API.Datastructures;
@@ -9,19 +10,32 @@ namespace VintageEssentials
 {
     /// <summary>
     /// Block entity for the Portable Crafting Table.
-    /// Manages a 72-slot internal storage inventory and handles GUI interactions.
+    /// Manages a 72-slot internal storage inventory, a 9-slot crafting grid,
+    /// and a 1-slot output area. Handles GUI interactions and crafting logic.
     /// </summary>
     public class BlockEntityPortableCraftingTable : BlockEntityContainer
     {
         private const int STORAGE_COLS = 12;
         private const int STORAGE_ROWS = 6;
-        private const int TOTAL_SLOTS = STORAGE_COLS * STORAGE_ROWS;
+        private const int STORAGE_SLOTS = STORAGE_COLS * STORAGE_ROWS;
+        public const int CRAFT_GRID_SLOTS = 9;
+        public const int OUTPUT_SLOTS = 1;
+        private const int TOTAL_SLOTS = STORAGE_SLOTS + CRAFT_GRID_SLOTS + OUTPUT_SLOTS;
 
-        private InventoryGeneric storageInventory;
+        private InventoryGeneric inventory;
         private PortableCraftingTableDialog dialog;
 
-        public override InventoryBase Inventory => storageInventory;
+        public override InventoryBase Inventory => inventory;
         public override string InventoryClassName => "portablecraftingtable";
+
+        /// <summary>Index of the first storage slot.</summary>
+        public int StorageSlotStart => 0;
+        /// <summary>Number of storage slots (72).</summary>
+        public int StorageSlotCount => STORAGE_SLOTS;
+        /// <summary>Index of the first crafting grid slot.</summary>
+        public int CraftGridSlotStart => STORAGE_SLOTS;
+        /// <summary>Index of the output slot.</summary>
+        public int OutputSlotStart => STORAGE_SLOTS + CRAFT_GRID_SLOTS;
 
         private string GetInventoryId()
         {
@@ -34,12 +48,177 @@ namespace VintageEssentials
 
         public override void Initialize(ICoreAPI api)
         {
-            if (storageInventory == null)
+            if (inventory == null)
             {
-                storageInventory = new InventoryGeneric(TOTAL_SLOTS, GetInventoryId(), api);
+                inventory = new InventoryGeneric(TOTAL_SLOTS, GetInventoryId(), api);
             }
 
             base.Initialize(api);
+
+            // Listen for slot changes to update crafting output
+            inventory.SlotModified += OnSlotModified;
+        }
+
+        private void OnSlotModified(int slotId)
+        {
+            // When a crafting grid slot changes, update the output
+            if (slotId >= CraftGridSlotStart && slotId < OutputSlotStart)
+            {
+                UpdateCraftingOutput();
+            }
+        }
+
+        /// <summary>
+        /// Checks the crafting grid against known recipes and places the result in the output slot.
+        /// </summary>
+        public void UpdateCraftingOutput()
+        {
+            if (Api == null) return;
+
+            // Build an array of the 9 crafting grid stacks
+            ItemSlot[] gridSlots = new ItemSlot[CRAFT_GRID_SLOTS];
+            for (int i = 0; i < CRAFT_GRID_SLOTS; i++)
+            {
+                gridSlots[i] = inventory[CraftGridSlotStart + i];
+            }
+
+            // Try to find a matching grid recipe
+            ItemSlot outputSlot = inventory[OutputSlotStart];
+            GridRecipe matchedRecipe = ResolveMatchingRecipe(gridSlots);
+
+            if (matchedRecipe != null)
+            {
+                ItemStack outputStack = matchedRecipe.Output.ResolvedItemstack?.Clone();
+                outputSlot.Itemstack = outputStack;
+            }
+            else
+            {
+                outputSlot.Itemstack = null;
+            }
+
+            outputSlot.MarkDirty();
+        }
+
+        private GridRecipe ResolveMatchingRecipe(ItemSlot[] gridSlots)
+        {
+            if (Api?.World == null) return null;
+
+            var recipes = Api.World.GridRecipes;
+            if (recipes == null) return null;
+
+            foreach (var recipe in recipes)
+            {
+                if (recipe == null) continue;
+                if (MatchesRecipe(recipe, gridSlots))
+                {
+                    return recipe;
+                }
+            }
+
+            return null;
+        }
+
+        private bool MatchesRecipe(GridRecipe recipe, ItemSlot[] gridSlots)
+        {
+            if (recipe.resolvedIngredients == null) return false;
+
+            int rw = recipe.Width;
+            int rh = recipe.Height;
+
+            // Try every valid offset in the 3x3 grid
+            for (int ox = 0; ox <= 3 - rw; ox++)
+            {
+                for (int oy = 0; oy <= 3 - rh; oy++)
+                {
+                    if (MatchesAtOffset(recipe, gridSlots, ox, oy))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool MatchesAtOffset(GridRecipe recipe, ItemSlot[] gridSlots, int ox, int oy)
+        {
+            int rw = recipe.Width;
+            int rh = recipe.Height;
+
+            for (int gy = 0; gy < 3; gy++)
+            {
+                for (int gx = 0; gx < 3; gx++)
+                {
+                    int slotIndex = gy * 3 + gx;
+                    ItemSlot slot = gridSlots[slotIndex];
+
+                    int rx = gx - ox;
+                    int ry = gy - oy;
+
+                    if (rx >= 0 && rx < rw && ry >= 0 && ry < rh)
+                    {
+                        int recipeIndex = ry * rw + rx;
+                        CraftingRecipeIngredient ingredient = recipe.resolvedIngredients[recipeIndex];
+
+                        if (ingredient == null || ingredient.IsTool)
+                        {
+                            // Null ingredient means empty slot expected (unless tool)
+                            if (ingredient == null && slot != null && !slot.Empty)
+                            {
+                                return false;
+                            }
+                            continue;
+                        }
+
+                        if (slot == null || slot.Empty)
+                        {
+                            return false;
+                        }
+
+                        if (!ingredient.SatisfiesAsIngredient(slot.Itemstack))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        // Outside the recipe area – slot must be empty
+                        if (slot != null && !slot.Empty)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Consumes one set of ingredients from the crafting grid and returns the output stack.
+        /// </summary>
+        public ItemStack PerformCraft()
+        {
+            ItemSlot outputSlot = inventory[OutputSlotStart];
+            if (outputSlot == null || outputSlot.Empty) return null;
+
+            ItemStack result = outputSlot.Itemstack.Clone();
+
+            // Consume one unit of each ingredient in the crafting grid
+            for (int i = 0; i < CRAFT_GRID_SLOTS; i++)
+            {
+                ItemSlot slot = inventory[CraftGridSlotStart + i];
+                if (slot != null && !slot.Empty)
+                {
+                    slot.TakeOut(1);
+                    slot.MarkDirty();
+                }
+            }
+
+            // Recalculate output
+            UpdateCraftingOutput();
+
+            return result;
         }
 
         public void OnBlockInteract(IPlayer byPlayer)
@@ -63,11 +242,11 @@ namespace VintageEssentials
 
         public int GetUsedSlotCount()
         {
-            if (storageInventory == null) return 0;
+            if (inventory == null) return 0;
             int count = 0;
-            for (int i = 0; i < storageInventory.Count; i++)
+            for (int i = 0; i < STORAGE_SLOTS; i++)
             {
-                if (storageInventory[i] != null && !storageInventory[i].Empty)
+                if (inventory[i] != null && !inventory[i].Empty)
                 {
                     count++;
                 }
@@ -77,16 +256,18 @@ namespace VintageEssentials
 
         public int GetTotalSlotCount()
         {
-            return TOTAL_SLOTS;
+            return STORAGE_SLOTS;
         }
 
         public void DropContents(IWorldAccessor world, BlockPos pos)
         {
-            if (storageInventory == null) return;
-            
-            for (int i = 0; i < storageInventory.Count; i++)
+            if (inventory == null) return;
+
+            // Drop storage and crafting grid contents (not the virtual output)
+            int dropCount = STORAGE_SLOTS + CRAFT_GRID_SLOTS;
+            for (int i = 0; i < dropCount; i++)
             {
-                ItemSlot slot = storageInventory[i];
+                ItemSlot slot = inventory[i];
                 if (slot != null && !slot.Empty)
                 {
                     world.SpawnItemEntity(slot.Itemstack, pos.ToVec3d().Add(0.5, 0.5, 0.5));
@@ -96,13 +277,44 @@ namespace VintageEssentials
             }
         }
 
+        /// <summary>
+        /// Scans nearby containers (within given radius) and returns all non-empty slots.
+        /// Re-uses the same pattern as ChestRadiusInventoryDialog.
+        /// </summary>
+        public List<ItemSlot> GetNearbyContainerSlots(int radius)
+        {
+            List<ItemSlot> slots = new List<ItemSlot>();
+            if (Api == null || Pos == null) return slots;
+
+            BlockPos minPos = new BlockPos(Pos.X - radius, Pos.Y - radius, Pos.Z - radius);
+            BlockPos maxPos = new BlockPos(Pos.X + radius, Pos.Y + radius, Pos.Z + radius);
+
+            Api.World.BlockAccessor.WalkBlocks(minPos, maxPos, (block, x, y, z) =>
+            {
+                BlockPos bpos = new BlockPos(x, y, z);
+                BlockEntity be = Api.World.BlockAccessor.GetBlockEntity(bpos);
+                if (be is BlockEntityContainer container && container != this && container.Inventory != null)
+                {
+                    foreach (ItemSlot slot in container.Inventory)
+                    {
+                        if (slot != null && !slot.Empty)
+                        {
+                            slots.Add(slot);
+                        }
+                    }
+                }
+            });
+
+            return slots;
+        }
+
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
         {
-            if (storageInventory == null)
+            if (inventory == null)
             {
-                storageInventory = new InventoryGeneric(TOTAL_SLOTS, GetInventoryId(), worldForResolving.Api);
+                inventory = new InventoryGeneric(TOTAL_SLOTS, GetInventoryId(), worldForResolving.Api);
             }
-            
+
             base.FromTreeAttributes(tree, worldForResolving);
         }
 
@@ -113,6 +325,10 @@ namespace VintageEssentials
 
         public override void OnBlockUnloaded()
         {
+            if (inventory != null)
+            {
+                inventory.SlotModified -= OnSlotModified;
+            }
             dialog?.TryClose();
             base.OnBlockUnloaded();
         }

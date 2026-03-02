@@ -14,6 +14,19 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
   - Items drop when block is broken
   - Inventory persists via NBT serialization
 
+- **Portable Crafting Table (Phase 2 — Storage Integration)**:
+  - 3×3 crafting grid with recipe output slot in the dialog
+  - Block entity now holds 72 storage + 9 crafting grid + 1 output = 82 inventory slots
+  - Real-time recipe matching — placing items in the grid instantly shows the output
+  - Taking the output consumes one unit of each ingredient
+  - Items can be freely transferred between crafting grid, table storage, and player inventory
+
+- **Cloud Crafting System (Phase 3)**:
+  - "Pull Ingredients" button in the Portable Crafting Table dialog
+  - Searches table's own storage first, then nearby containers (15-block radius)
+  - `CloudCraftingSystem` static helper class for ingredient scanning and gathering
+  - `RefillCraftingGrid()` utility to top up crafting grid stacks for batch crafting
+
 - **Localization** - Added English language file (`assets/vintageessentials/lang/en.json`):
   - All UI strings for chest radius inventory, sorting, slot locking, and configuration dialogs
   - Portable crafting table block name and description
