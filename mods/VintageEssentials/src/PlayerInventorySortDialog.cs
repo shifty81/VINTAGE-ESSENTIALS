@@ -33,7 +33,9 @@ namespace VintageEssentials
             // Collect all non-empty slots and their contents (excluding hotbar and offhand)
             List<ItemSlot> slots = new List<ItemSlot>();
             List<ItemStack> stacks = new List<ItemStack>();
-            int slotIndex = 0;
+
+            string playerUid = player.PlayerUID;
+            HashSet<int> lockedSlots = lockedSlotsManager.GetLockedSlots(playerUid);
 
             int slotIndex = 0;
             foreach (ItemSlot slot in playerInv)
