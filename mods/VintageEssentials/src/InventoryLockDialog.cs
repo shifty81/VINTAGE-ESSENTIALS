@@ -15,7 +15,7 @@ namespace VintageEssentials
         private Action<bool> onModeChanged;
 
         public InventoryLockDialog(ICoreClientAPI capi, LockedSlotsManager lockedSlotsManager, ModConfig config, Action<bool> onModeChanged) 
-            : base("Inventory Slot Locking", capi)
+            : base(Lang.Get("vintageessentials:lock-mode-on"), capi)
         {
             this.capi = capi;
             this.lockedSlotsManager = lockedSlotsManager;
@@ -38,11 +38,11 @@ namespace VintageEssentials
                 string playerUid = capi.World.Player.PlayerUID;
                 int lockedCount = lockedSlotsManager.GetLockedSlotsCount(playerUid);
                 int maxSlots = config.MaxLockedSlots;
-                capi.ShowChatMessage($"Slot locking mode ENABLED. Click inventory slots to lock them. ({lockedCount}/{maxSlots} locked)");
+                capi.ShowChatMessage(Lang.Get("vintageessentials:lock-enabled", lockedCount, maxSlots));
             }
             else
             {
-                capi.ShowChatMessage("Slot locking mode DISABLED.");
+                capi.ShowChatMessage(Lang.Get("vintageessentials:lock-disabled"));
             }
         }
 
@@ -55,19 +55,19 @@ namespace VintageEssentials
             
             if (nowLocked)
             {
-                capi.ShowChatMessage($"Slot {slotId} locked.");
+                capi.ShowChatMessage(Lang.Get("vintageessentials:lock-slot-locked", slotId));
             }
             else
             {
                 int lockedCount = lockedSlotsManager.GetLockedSlotsCount(playerUid);
                 if (lockedSlotsManager.IsSlotLocked(playerUid, slotId))
                 {
-                    capi.ShowChatMessage($"Cannot lock more slots. Maximum is {config.MaxLockedSlots}.");
+                    capi.ShowChatMessage(Lang.Get("vintageessentials:lock-max-reached", config.MaxLockedSlots));
                     return false;
                 }
                 else
                 {
-                    capi.ShowChatMessage($"Slot {slotId} unlocked.");
+                    capi.ShowChatMessage(Lang.Get("vintageessentials:lock-slot-unlocked", slotId));
                 }
             }
             

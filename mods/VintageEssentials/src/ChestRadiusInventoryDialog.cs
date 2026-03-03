@@ -25,7 +25,7 @@ namespace VintageEssentials
         private DummyInventory displayInventory;
         private Dictionary<int, ItemSlot> displaySlotToActualSlot = new Dictionary<int, ItemSlot>();
         
-        public ChestRadiusInventoryDialog(ICoreClientAPI capi) : base("Nearby Chests", capi)
+        public ChestRadiusInventoryDialog(ICoreClientAPI capi) : base(Lang.Get("vintageessentials:chestradius-title"), capi)
         {
             this.capi = capi;
             displayInventory = new DummyInventory(capi, this);
@@ -115,21 +115,21 @@ namespace VintageEssentials
 
             SingleComposer = capi.Gui.CreateCompo("chestradius", dialogBounds)
                 .AddShadedDialogBG(bgBounds)
-                .AddDialogTitleBar("Nearby Chests (15 block radius)", OnTitleBarClose)
+                .AddDialogTitleBar(Lang.Get("vintageessentials:chestradius-title"), OnTitleBarClose)
                 .BeginChildElements(bgBounds)
-                    .AddStaticText($"Found {nearbyContainers.Count} containers with {allSlots.Count} items", 
+                    .AddStaticText(Lang.Get("vintageessentials:chestradius-found", nearbyContainers.Count, allSlots.Count), 
                                    CairoFont.WhiteDetailText(), ElementBounds.Fixed(0, 5, elemWidth, 20))
                     .AddTextInput(searchBounds, OnSearchChanged, CairoFont.WhiteDetailText(), "searchbox")
-                    .AddSmallButton("Sort", OnSortClicked, sortButtonBounds, EnumButtonStyle.Normal, "sortbtn")
-                    .AddSmallButton("Deposit All", OnDepositClicked, depositButtonBounds, EnumButtonStyle.Normal, "depositbtn")
-                    .AddSmallButton("Take All", OnTakeAllClicked, takeAllButtonBounds, EnumButtonStyle.Normal, "takebtn")
+                    .AddSmallButton(Lang.Get("vintageessentials:chestradius-sort"), OnSortClicked, sortButtonBounds, EnumButtonStyle.Normal, "sortbtn")
+                    .AddSmallButton(Lang.Get("vintageessentials:chestradius-deposit"), OnDepositClicked, depositButtonBounds, EnumButtonStyle.Normal, "depositbtn")
+                    .AddSmallButton(Lang.Get("vintageessentials:chestradius-takeall"), OnTakeAllClicked, takeAllButtonBounds, EnumButtonStyle.Normal, "takebtn")
                     .AddItemSlotGrid(displayInventory, SendInvPacket, SLOTS_PER_ROW, slotBounds, "slotgrid")
                     .AddVerticalScrollbar(OnScroll, scrollbarBounds, "scrollbar")
-                    .AddSmallButton("Close", OnCloseClicked, closeButtonBounds)
+                    .AddSmallButton(Lang.Get("vintageessentials:chestradius-close"), OnCloseClicked, closeButtonBounds)
                 .EndChildElements()
                 .Compose();
 
-            SingleComposer.GetTextInput("searchbox").SetPlaceHolderText("Search items...");
+            SingleComposer.GetTextInput("searchbox").SetPlaceHolderText(Lang.Get("vintageessentials:chestradius-search"));
             
             UpdateScrollbar();
             RenderItemGrid();
@@ -269,7 +269,11 @@ namespace VintageEssentials
             int totalRows = (int)Math.Ceiling((double)filteredSlots.Count / SLOTS_PER_ROW);
             int maxScroll = Math.Max(0, totalRows - VISIBLE_ROWS);
             
-            // Update scrollbar (simplified - actual implementation would need proper scrollbar handling)
+            var scrollbar = SingleComposer.GetScrollbar("scrollbar");
+            if (scrollbar != null)
+            {
+                scrollbar.SetHeights((float)VISIBLE_ROWS, (float)totalRows);
+            }
         }
 
         private void OnSearchChanged(string text)
@@ -281,7 +285,7 @@ namespace VintageEssentials
         private bool OnSortClicked()
         {
             isSorted = !isSorted;
-            capi.ShowChatMessage(isSorted ? "Sorting enabled (A-Z)" : "Sorting disabled");
+            capi.ShowChatMessage(isSorted ? Lang.Get("vintageessentials:chestradius-sorting-on") : Lang.Get("vintageessentials:chestradius-sorting-off"));
             ApplyFiltersAndSort();
             return true;
         }
@@ -347,7 +351,7 @@ namespace VintageEssentials
                 }
             }
 
-            capi.ShowChatMessage($"Deposited {deposited} items");
+            capi.ShowChatMessage(Lang.Get("vintageessentials:chestradius-deposited", deposited));
             RefreshContainers();
             return true;
         }
@@ -389,7 +393,7 @@ namespace VintageEssentials
                 }
             }
 
-            capi.ShowChatMessage($"Took {taken} items");
+            capi.ShowChatMessage(Lang.Get("vintageessentials:chestradius-taken", taken));
             RefreshContainers();
             return true;
         }
@@ -579,16 +583,14 @@ namespace VintageEssentials
         {
             if (this.Empty || dialog == null) return 0;
 
+            // Remember stack size before transfer to calculate actual amount moved
+            int stackBefore = sinkSlot.Empty ? 0 : sinkSlot.StackSize;
+
             // Transfer from the actual chest slot to the sink slot (typically player inventory)
             bool success = dialog.TryTakeFromDisplaySlot(displaySlotId, sinkSlot);
             if (success)
             {
-                // Calculate how much was transferred
-                int transferred = Math.Min(this.StackSize, this.StackSize);
-                
-                // Update the display - the actual work was done in TryTakeFromDisplaySlot
-                // Don't modify this slot directly, as it's just a display copy
-                
+                int transferred = sinkSlot.Empty ? 0 : sinkSlot.StackSize - stackBefore;
                 return transferred;
             }
 

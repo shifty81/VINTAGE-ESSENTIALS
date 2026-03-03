@@ -25,7 +25,7 @@ namespace VintageEssentials
         private bool captureShift = false;
         private bool captureAlt = false;
 
-        public KeybindConflictDialog(ICoreClientAPI capi, ModConfig config, Action onKeybindsChanged) : base("Keybind Conflicts", capi)
+        public KeybindConflictDialog(ICoreClientAPI capi, ModConfig config, Action onKeybindsChanged) : base(Lang.Get("vintageessentials:conflict-header"), capi)
         {
             this.capi = capi;
             this.config = config;
@@ -71,20 +71,20 @@ namespace VintageEssentials
             var conflictInfo = conflicts[currentConflictIndex];
             string conflictMessage = GetConflictMessage(conflictInfo);
             string currentKey = config.GetKeybindDisplayString(conflictInfo.HotkeyCode);
-            string buttonText = isCapturingKey ? "Press key..." : "Change Key";
+            string buttonText = isCapturingKey ? Lang.Get("vintageessentials:config-presskey-btn") : Lang.Get("vintageessentials:conflict-changekey");
             
             SingleComposer = capi.Gui.CreateCompo("keybindconflict", dialogBounds)
                 .AddShadedDialogBG(bgBounds)
-                .AddDialogTitleBar($"Keybind Conflict ({currentConflictIndex + 1}/{conflicts.Count})", OnTitleBarClose)
+                .AddDialogTitleBar(Lang.Get("vintageessentials:conflict-title", currentConflictIndex + 1, conflicts.Count), OnTitleBarClose)
                 .BeginChildElements(bgBounds)
-                    .AddStaticText("VintageEssentials Keybind Conflict", CairoFont.WhiteSmallText(), 
+                    .AddStaticText(Lang.Get("vintageessentials:conflict-header"), CairoFont.WhiteSmallText(), 
                                    ElementBounds.Fixed(0, 5, elemWidth, 20))
                     .AddStaticText(conflictMessage, CairoFont.WhiteDetailText(), textBounds)
                     .AddStaticText($"Current: {currentKey}", CairoFont.WhiteSmallText(), currentKeyBounds)
                     .AddSmallButton(buttonText, OnChangeKeyClicked, changeKeyButtonBounds, EnumButtonStyle.Normal, "changeKeyBtn")
-                    .AddSmallButton("Accept", OnAcceptClicked, acceptButtonBounds)
-                    .AddSmallButton("Skip", OnSkipClicked, skipButtonBounds)
-                    .AddSmallButton("Skip All", OnSkipAllClicked, skipAllButtonBounds)
+                    .AddSmallButton(Lang.Get("vintageessentials:conflict-accept"), OnAcceptClicked, acceptButtonBounds)
+                    .AddSmallButton(Lang.Get("vintageessentials:conflict-skip"), OnSkipClicked, skipButtonBounds)
+                    .AddSmallButton(Lang.Get("vintageessentials:conflict-skipall"), OnSkipAllClicked, skipAllButtonBounds)
                 .EndChildElements()
                 .Compose();
                 
@@ -98,8 +98,7 @@ namespace VintageEssentials
         private string GetConflictMessage(ConflictInfo conflictInfo)
         {
             string baseMessage = GetFeatureDescription(conflictInfo.HotkeyCode);
-            return $"{baseMessage}\n\nConflict detected with: {conflictInfo.ConflictingWith}\n\n" +
-                   $"You can change this keybind to avoid the conflict.";
+            return Lang.Get("vintageessentials:conflict-message", baseMessage, conflictInfo.ConflictingWith);
         }
         
         private string GetFeatureDescription(string hotkeyCode)
@@ -107,13 +106,13 @@ namespace VintageEssentials
             switch (hotkeyCode)
             {
                 case "chestradius":
-                    return "Chest Radius Inventory - Opens a dialog showing all items in chests within 15 blocks. Allows quick searching and management.";
+                    return Lang.Get("vintageessentials:feature-chestradius");
                 case "playerinvsort":
-                    return "Player Inventory Sort - Sorts your inventory alphabetically, keeping locked slots in place.";
+                    return Lang.Get("vintageessentials:feature-sort");
                 case "toggleslotlock":
-                    return "Toggle Slot Locking - Enables/disables locking mode. When active, click slots to lock/unlock them.";
+                    return Lang.Get("vintageessentials:feature-lock");
                 case "veconfig":
-                    return "VintageEssentials Settings - Opens the mod configuration dialog.";
+                    return Lang.Get("vintageessentials:feature-config");
                 default:
                     return hotkeyCode;
             }
@@ -128,7 +127,7 @@ namespace VintageEssentials
                 captureShift = false;
                 captureAlt = false;
                 ComposeDialog();
-                capi.ShowChatMessage("Press any key combination (you can use Ctrl, Shift, Alt modifiers)");
+                capi.ShowChatMessage(Lang.Get("vintageessentials:conflict-presskey"));
             }
             return true;
         }
@@ -179,7 +178,7 @@ namespace VintageEssentials
                         
                         isCapturingKey = false;
                         string keyDisplay = config.GetKeybindDisplayString(conflictInfo.HotkeyCode);
-                        capi.ShowChatMessage($"Keybind changed to: {keyDisplay}");
+                        capi.ShowChatMessage(Lang.Get("vintageessentials:conflict-changed", keyDisplay));
                         
                         ComposeDialog();
                     }

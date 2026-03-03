@@ -59,7 +59,7 @@ namespace VintageEssentials
 
             if (stacks.Count == 0)
             {
-                capi.ShowChatMessage("No items to sort!");
+                capi.ShowChatMessage(Lang.Get("vintageessentials:sort-noitems"));
                 return;
             }
 
@@ -85,7 +85,7 @@ namespace VintageEssentials
                 }
             }
 
-            capi.ShowChatMessage("Inventory sorted by name (A-Z) - Hotbar and offhand preserved");
+            capi.ShowChatMessage(Lang.Get("vintageessentials:sort-done"));
         }
 
         public void Dispose()

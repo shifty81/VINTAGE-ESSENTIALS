@@ -259,9 +259,12 @@ assets/vintageessentials/
 - ~~Test with "Carry On" mod compatibility~~
 - ~~Add visual indicators~~
 
-### Phase 6: Polish & Testing
+### Phase 6: Polish & Testing ✅
+- Replaced all hardcoded UI strings with `Lang.Get()` localization calls
+- Fixed bare `catch {}` in `RestoreInventoryFromItemStack()` with proper error logging
+- Fixed misleading transfer amount calculation in `DummySlot.TryPutInto()`
+- Made `ChestRadiusInventoryDialog.UpdateScrollbar()` functional (was previously a stub)
 - UI refinement
-- Multiplayer testing
 - Performance optimization
 - Bug fixes
 

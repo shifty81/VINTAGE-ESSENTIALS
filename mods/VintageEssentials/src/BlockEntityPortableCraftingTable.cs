@@ -340,8 +340,9 @@ namespace VintageEssentials
                             inventory[i].MarkDirty();
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Api.World.Logger.Error($"VintageEssentials: Failed to restore inventory slot {i}: {ex.Message}");
                         restoredSuccessfully = false;
                     }
                 }
