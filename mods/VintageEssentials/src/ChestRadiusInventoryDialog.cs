@@ -591,7 +591,7 @@ namespace VintageEssentials
             if (success)
             {
                 int transferred = sinkSlot.Empty ? 0 : sinkSlot.StackSize - stackBefore;
-                return Math.Max(transferred, 1);
+                return transferred;
             }
 
             return 0;
