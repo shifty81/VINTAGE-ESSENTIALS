@@ -13,7 +13,7 @@ namespace VintageEssentials
         private Dictionary<string, bool> capturingKeys = new Dictionary<string, bool>();
         private Dictionary<string, KeybindConfig> tempKeybinds = new Dictionary<string, KeybindConfig>();
 
-        public ModConfigDialog(ICoreClientAPI capi, ModConfig config, Action onKeybindsChanged) : base("Mod Settings", capi)
+        public ModConfigDialog(ICoreClientAPI capi, ModConfig config, Action onKeybindsChanged) : base(Lang.Get("vintageessentials:config-title"), capi)
         {
             this.capi = capi;
             this.config = config;
@@ -69,15 +69,15 @@ namespace VintageEssentials
             
             var composer = capi.Gui.CreateCompo("modconfig", dialogBounds)
                 .AddShadedDialogBG(bgBounds)
-                .AddDialogTitleBar("VintageEssentials Settings", OnTitleBarClose)
+                .AddDialogTitleBar(Lang.Get("vintageessentials:config-title"), OnTitleBarClose)
                 .BeginChildElements(bgBounds)
-                    .AddStaticText("Max Locked Slots:", CairoFont.WhiteDetailText(), maxSlotsLabelBounds)
+                    .AddStaticText(Lang.Get("vintageessentials:config-maxslots"), CairoFont.WhiteDetailText(), maxSlotsLabelBounds)
                     .AddNumberInput(maxSlotsInputBounds, OnMaxSlotsChanged, CairoFont.WhiteDetailText(), "maxslotsInput")
-                    .AddStaticText("Stack Size Multiplier:", CairoFont.WhiteDetailText(), stackSizeLabelBounds)
+                    .AddStaticText(Lang.Get("vintageessentials:config-stackmult"), CairoFont.WhiteDetailText(), stackSizeLabelBounds)
                     .AddSlider(OnStackSizeChanged, stackSizeSliderBounds, "stackSizeSlider")
                     .AddStaticText($"{config.StackSizeMultiplier}x", CairoFont.WhiteSmallText(), stackSizeValueBounds, "stackSizeValue")
-                    .AddStaticText("Applies to items that initially stack ≤10\n(Requires game restart to take effect)", CairoFont.WhiteSmallText(), stackSizeInfoBounds)
-                    .AddStaticText("Keybinds:", CairoFont.WhiteDetailText(), keybindsTitleBounds);
+                    .AddStaticText(Lang.Get("vintageessentials:config-stackinfo"), CairoFont.WhiteSmallText(), stackSizeInfoBounds)
+                    .AddStaticText(Lang.Get("vintageessentials:config-keybinds"), CairoFont.WhiteDetailText(), keybindsTitleBounds);
             
             // Add keybind controls
             foreach (var kvp in keybindNames)
@@ -102,7 +102,7 @@ namespace VintageEssentials
                 
                 string currentKey = GetKeybindDisplay(tempKeybinds[code]);
                 bool isCapturing = capturingKeys.ContainsKey(code) && capturingKeys[code];
-                string buttonText = isCapturing ? "Press key..." : "Change";
+                string buttonText = isCapturing ? Lang.Get("vintageessentials:config-presskey-btn") : Lang.Get("vintageessentials:config-change");
                 
                 composer
                     .AddStaticText(name + ":", CairoFont.WhiteSmallText(), bounds.label)
@@ -111,8 +111,8 @@ namespace VintageEssentials
             }
             
             composer
-                .AddSmallButton("Save", OnSaveClicked, saveButtonBounds)
-                .AddSmallButton("Cancel", OnCancelClicked, cancelButtonBounds)
+                .AddSmallButton(Lang.Get("vintageessentials:config-save"), OnSaveClicked, saveButtonBounds)
+                .AddSmallButton(Lang.Get("vintageessentials:config-cancel"), OnCancelClicked, cancelButtonBounds)
                 .EndChildElements();
             
             // Calculate children for auto-sizing
@@ -181,7 +181,7 @@ namespace VintageEssentials
             // Start capturing for this keybind
             capturingKeys[hotkeyCode] = true;
             ComposeDialog();
-            capi.ShowChatMessage($"Press any key combination for {hotkeyCode} (press Escape to cancel)");
+            capi.ShowChatMessage(Lang.Get("vintageessentials:config-presskey", hotkeyCode));
             return true;
         }
         
@@ -213,7 +213,7 @@ namespace VintageEssentials
                     // Cancel capture
                     capturingKeys[capturingCode] = false;
                     ComposeDialog();
-                    capi.ShowChatMessage("Keybind change cancelled");
+                    capi.ShowChatMessage(Lang.Get("vintageessentials:config-keybindcancelled"));
                     return;
                 }
                 
@@ -233,7 +233,7 @@ namespace VintageEssentials
                     ComposeDialog();
                     
                     string keyDisplay = GetKeybindDisplay(tempKeybinds[capturingCode]);
-                    capi.ShowChatMessage($"Keybind set to: {keyDisplay}");
+                    capi.ShowChatMessage(Lang.Get("vintageessentials:config-keybindset", keyDisplay));
                 }
                 return;
             }
@@ -258,7 +258,7 @@ namespace VintageEssentials
             }
             
             config.Save(capi);
-            capi.ShowChatMessage("Settings saved! Stack size changes require a game restart to take effect.");
+            capi.ShowChatMessage(Lang.Get("vintageessentials:config-saved"));
             
             // Notify keybinds changed
             onKeybindsChanged?.Invoke();

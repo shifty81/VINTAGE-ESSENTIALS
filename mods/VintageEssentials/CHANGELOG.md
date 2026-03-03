@@ -5,7 +5,33 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 ## [Unreleased]
 
 ### Added
-- **Handbook Integration (Phase 4)** - Recipe browsing and auto-fill for Portable Crafting Table:
+- **Phase 6: Polish & Testing** — UI refinement, bug fixes, and localization consistency:
+  - All hardcoded UI strings replaced with `Lang.Get()` localization calls across all dialog classes
+  - Fully functional scrollbar in Chest Radius Inventory dialog (previously a non-functional stub)
+
+### Fixed
+- **Inventory Restoration Logging** — `BlockEntityPortableCraftingTable.RestoreInventoryFromItemStack()`:
+  - Bare `catch {}` replaced with proper error logging (`Api.World.Logger.Error`) per slot
+  - Failed slot restorations now report the slot index and exception message
+
+- **DummySlot Transfer Calculation** — `DummySlot.TryPutInto()` in Chest Radius Inventory:
+  - Was using `Math.Min(this.StackSize, this.StackSize)` which always returns the same value
+  - Now correctly computes the actual number of items transferred by comparing sink slot before/after
+
+- **Chest Radius Scrollbar** — `ChestRadiusInventoryDialog.UpdateScrollbar()`:
+  - Was a stub with only a comment; scroll bar never updated in response to content changes
+  - Now calls `scrollbar.SetHeights()` to properly reflect visible vs total rows
+
+### Changed
+- **Localization Consistency** — All user-facing strings now use `Lang.Get()` with keys from `en.json`:
+  - `ChestRadiusInventoryDialog`: title, button labels, search placeholder, status messages
+  - `InventoryLockDialog`: locking mode messages, slot lock/unlock feedback, max slot warnings
+  - `PlayerInventorySortDialog`: no-items and sort-complete messages
+  - `ModConfigDialog`: title bar, labels, button text, keybind capture prompts, save confirmation
+  - `KeybindConflictDialog`: header, title, buttons, feature descriptions, conflict messages
+  - `VintageEssentialsClientSystem`: loaded message, locking mode callbacks, keybind update message
+
+- Updated PORTABLE_CRAFTING_SPEC.md to reflect Phase 6 completion
   - "Handbook" button in the crafting table dialog opens the in-game handbook
   - `HandbookIntegration` helper class with recipe lookup by output item
   - `AutoFillRecipe()` method to automatically fill crafting grid from a selected recipe

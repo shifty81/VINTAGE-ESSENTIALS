@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 
 namespace VintageEssentials
 {
@@ -57,7 +58,7 @@ namespace VintageEssentials
             clientApi.Event.PlayerEntitySpawn += OnPlayerSpawn;
 
             clientApi.Logger.Notification("VintageEssentials client-side loaded.");
-            clientApi.ShowChatMessage("VintageEssentials loaded! Press Ctrl+Shift+V to open settings or use /veconfig");
+            clientApi.ShowChatMessage(Lang.Get("vintageessentials:loaded"));
         }
         
         private KeybindConfig GetKeybindOrDefault(string hotkeyCode)
@@ -149,7 +150,7 @@ namespace VintageEssentials
             // So we'll just re-register them which will override the previous handlers
             clientApi.Logger.Debug("VintageEssentials: Re-registering hotkeys after config change");
             RegisterKeybinds();
-            clientApi.ShowChatMessage("Keybinds updated!");
+            clientApi.ShowChatMessage(Lang.Get("vintageessentials:config-keybindsupdated"));
         }
 
         private void OnPlayerSpawn(IClientPlayer player)
@@ -226,11 +227,11 @@ namespace VintageEssentials
             // This callback can be used to update UI or other systems when locking mode changes
             if (lockingMode)
             {
-                clientApi.ShowChatMessage("Locking mode ON - Click inventory slots to lock/unlock them");
+                clientApi.ShowChatMessage(Lang.Get("vintageessentials:lock-mode-on"));
             }
             else
             {
-                clientApi.ShowChatMessage("Locking mode OFF");
+                clientApi.ShowChatMessage(Lang.Get("vintageessentials:lock-mode-off"));
             }
         }
 
