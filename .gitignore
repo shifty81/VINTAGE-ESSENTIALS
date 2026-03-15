@@ -25,7 +25,7 @@ bld/
 *.exe
 *.pdb
 *.cache
-*.zip
+
 
 # VS Code
 .vscode/
