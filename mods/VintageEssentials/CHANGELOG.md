@@ -15,6 +15,11 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
   - **Unloaded chunk detection**: Added logging when an entire column returns no solid blocks, indicating the chunk may not have loaded in time.
   - **Debug logging**: RTP retry attempts are now logged with position info for server-side troubleshooting.
 
+- **Player Inventory Sort — Crash and World Corruption** — `PlayerInventorySortDialog.SortPlayerInventory()`:
+  - **Crash**: `MarkDirty()` threw `ArgumentException: Supplied slot is not part of this inventory` because slots collected via `foreach` iterator lost their inventory association. Now accesses slots by index through `playerInv[index]` so the inventory correctly recognizes the slot.
+  - **World corruption**: The old two-phase approach (clear ALL slots to null → reassign sorted items) meant that if the crash occurred mid-clear, items already nulled were permanently lost from the world save. Now assigns sorted items directly to each slot in a single pass with no intermediate empty state.
+  - **Null safety**: Added null-coalescing fallback on `GetName()` (`?? ""`) to prevent crashes from items with null display names.
+
 - **Player Inventory Sort — Wrong Inventory Class** — `PlayerInventorySortDialog.SortPlayerInventory()`:
   - Was calling `GetOwnInventory(GlobalConstants.characterInvClassName)` which returns the player's clothing and armor slots, causing `Shift+S` to silently sort armor/clothing slots instead of bag items.
   - Now correctly sorts the `backpackInvClassName` ("backpack") inventory, which contains the player's bag storage slots.
