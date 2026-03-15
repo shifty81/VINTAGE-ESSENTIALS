@@ -23,10 +23,10 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 
 ### Player Inventory Sorting
 
-- **Press `Shift+S`** - Sort your player inventory by name (A-Z)
+- **Press `Shift+S`** - Sort your bag storage inventory by name (A-Z)
 - **Locked slots are preserved** - Items in locked slots won't be moved during sorting
 - Quick and convenient organization
-- **Preserves hotbar and offhand** - Your hotbar (slots 1-10) and offhand items remain in place
+- **Hotbar is untouched** - Only your bag storage (backpack) slots are sorted; the hotbar remains exactly as you left it
 
 ### Inventory Slot Locking (NEW!)
 
@@ -225,9 +225,9 @@ The mod will find a safe landing spot at ground level.
 
 ### Sorting Your Inventory
 
-1. Press `Shift+S` to sort your player inventory by name (A-Z)
+1. Press `Shift+S` to sort your bag storage inventory by name (A-Z)
 2. Items will be organized alphabetically for easy access
-3. Your hotbar (slots 1-10) and offhand items will remain in place during sorting
+3. Your hotbar items and locked slots remain in place during sorting
 
 ## Data Storage
 

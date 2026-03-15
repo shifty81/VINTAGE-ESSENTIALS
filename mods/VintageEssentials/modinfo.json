@@ -4,7 +4,7 @@
   "name": "Vintage Essentials",
   "author": "shifty81",
   "description": "Essential commands and quality of life improvements including /home, /sethome, /rtp commands, chest radius inventory (press R), player inventory sorting (Shift+S), inventory slot locking (Ctrl+L), increased stack sizes, portable crafting table with handbook integration, and block pickup with inventory preservation",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "dependency": {
     "game": "1.19.0"
   },
