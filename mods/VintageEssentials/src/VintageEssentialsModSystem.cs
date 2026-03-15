@@ -31,7 +31,7 @@ namespace VintageEssentials
         public override void AssetsFinalize(ICoreAPI api)
         {
             // Constants for stack size limits
-            const int SMALL_ITEM_THRESHOLD = 10;  // Items that stack to 10 or less
+            const int MIN_STACK_THRESHOLD = 16;    // Items that stack under 16 are excluded
             const int VANILLA_CAP = 1000;          // Max stack for items already high
             const int MAX_ALLOWED_STACK = 10000;   // Absolute maximum stack size
             
@@ -48,18 +48,15 @@ namespace VintageEssentials
                     // Get the original/current max stack size
                     int originalMaxStack = collectible.MaxStackSize;
                     
-                    // Only apply to items that originally stack up to 10 or less
-                    // (or already modified items with higher values)
-                    if (originalMaxStack > 0 && originalMaxStack <= SMALL_ITEM_THRESHOLD)
+                    // Skip items that stack under 16 (tools, weapons, armor, etc.)
+                    if (originalMaxStack < MIN_STACK_THRESHOLD)
                     {
-                        // Apply multiplier
-                        int newMaxStack = originalMaxStack * config.StackSizeMultiplier;
-                        collectible.MaxStackSize = newMaxStack;
-                        patchedCount++;
+                        continue;
                     }
-                    else if (originalMaxStack > SMALL_ITEM_THRESHOLD && originalMaxStack < VANILLA_CAP)
+                    
+                    // Apply multiplier to items that stack 16 or more, capped at MAX_ALLOWED_STACK
+                    if (originalMaxStack < VANILLA_CAP)
                     {
-                        // For items that stack higher than 10, also apply multiplier but cap at reasonable value
                         int newMaxStack = Math.Min(originalMaxStack * config.StackSizeMultiplier, MAX_ALLOWED_STACK);
                         collectible.MaxStackSize = newMaxStack;
                         patchedCount++;

@@ -28,7 +28,7 @@
   "vintageessentials:config-title": "VintageEssentials Settings",
   "vintageessentials:config-maxslots": "Max Locked Slots:",
   "vintageessentials:config-stackmult": "Stack Size Multiplier:",
-  "vintageessentials:config-stackinfo": "Applies to items that initially stack ≤10\n(Requires game restart to take effect)",
+  "vintageessentials:config-stackinfo": "Applies to items that initially stack 16 or more\n(Requires game restart to take effect)",
   "vintageessentials:config-keybinds": "Keybinds:",
   "vintageessentials:config-save": "Save",
   "vintageessentials:config-cancel": "Cancel",
