@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="mods/VintageEssentials/"><img src="https://img.shields.io/badge/Vintage_Story-Mod-8B6914?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMyA5bDkgNyA5LTd6Ii8+PHBhdGggZmlsbD0iI2RkZCIgZD0iTTMgOXY3bDkgNVYxNHoiLz48cGF0aCBmaWxsPSIjYmJiIiBkPSJNMjEgOXY3bC05IDVWMTR6Ii8+PC9zdmc+" alt="VS Mod" /></a>
+  <a href="mods/VintageEssentials/"><img src="https://img.shields.io/badge/Vintage_Story-Mod-8B6914?style=for-the-badge" alt="VS Mod" /></a>
   <a href="#"><img src="https://img.shields.io/badge/C%23-.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="C# .NET" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" /></a>
   <a href="mods/VintageEssentials/CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.6.0-blue?style=for-the-badge" alt="Version" /></a>

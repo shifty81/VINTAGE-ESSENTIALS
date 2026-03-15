@@ -248,27 +248,30 @@ namespace VintageEssentials
             double newX = currentPos.X;
             double newZ = currentPos.Z;
 
-            // Calculate new position based on direction with perpendicular offset
+            // Calculate new position based on direction
             // In Vintage Story, negative Z is North, positive Z is South
+            // Lateral offset is applied perpendicular to the travel direction
             switch (direction)
             {
                 case "north":
                     newZ -= distance;
-                    newX += lateralOffset;
                     break;
                 case "south":
                     newZ += distance;
-                    newX += lateralOffset;
                     break;
                 case "east":
                     newX += distance;
-                    newZ += lateralOffset;
                     break;
                 case "west":
                     newX -= distance;
-                    newZ += lateralOffset;
                     break;
             }
+
+            // Apply perpendicular offset: X-axis for north/south, Z-axis for east/west
+            if (direction == "north" || direction == "south")
+                newX += lateralOffset;
+            else
+                newZ += lateralOffset;
 
             // Force-load a 3x3 grid of chunk columns around the target so terrain
             // generates properly (world gen often needs neighbor chunks).
