@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1a3e"/>
+      <stop offset="40%" stop-color="#2d1b4e"/>
+      <stop offset="70%" stop-color="#4a2040"/>
+      <stop offset="100%" stop-color="#6b3a30"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2d5a1e"/>
+      <stop offset="100%" stop-color="#1a3a10"/>
+    </linearGradient>
+    <linearGradient id="title-gradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0d080"/>
+      <stop offset="50%" stop-color="#ffecb3"/>
+      <stop offset="100%" stop-color="#f0d080"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Sky background -->
+  <rect width="900" height="320" fill="url(#sky)"/>
+
+  <!-- Stars -->
+  <circle cx="80" cy="30" r="1.5" fill="#fff" opacity="0.8"/>
+  <circle cx="200" cy="55" r="1" fill="#fff" opacity="0.6"/>
+  <circle cx="320" cy="20" r="1.5" fill="#fff" opacity="0.9"/>
+  <circle cx="450" cy="45" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="560" cy="15" r="1.5" fill="#fff" opacity="0.7"/>
+  <circle cx="680" cy="50" r="1" fill="#fff" opacity="0.8"/>
+  <circle cx="780" cy="25" r="1.5" fill="#fff" opacity="0.6"/>
+  <circle cx="850" cy="60" r="1" fill="#fff" opacity="0.9"/>
+  <circle cx="130" cy="65" r="1" fill="#fff" opacity="0.4"/>
+  <circle cx="620" cy="70" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="380" cy="75" r="1.5" fill="#fff" opacity="0.3"/>
+  <circle cx="730" cy="40" r="1" fill="#fff" opacity="0.7"/>
+
+  <!-- Moon -->
+  <circle cx="780" cy="60" r="25" fill="#f5e6c8" opacity="0.9"/>
+  <circle cx="790" cy="55" r="22" fill="url(#sky)" opacity="0.7"/>
+
+  <!-- Distant mountains -->
+  <polygon points="0,200 80,140 160,190 240,120 340,170 400,130 500,180 560,110 650,160 720,135 800,175 900,150 900,200" fill="#1a3330" opacity="0.6"/>
+  <polygon points="0,210 100,160 180,200 280,150 380,190 460,145 550,195 640,150 740,190 820,155 900,180 900,210" fill="#1a3a2a" opacity="0.7"/>
+
+  <!-- Ground layer -->
+  <rect x="0" y="210" width="900" height="110" fill="url(#ground)"/>
+
+  <!-- Pixelated trees (Vintage Story style) -->
+  <!-- Tree 1 -->
+  <rect x="60" y="170" width="8" height="40" fill="#4a2810"/>
+  <rect x="44" y="148" width="40" height="28" fill="#2a6b1a" rx="2"/>
+  <rect x="50" y="140" width="28" height="16" fill="#3a8a2a" rx="2"/>
+
+  <!-- Tree 2 -->
+  <rect x="160" y="178" width="8" height="32" fill="#4a2810"/>
+  <rect x="146" y="158" width="36" height="24" fill="#1a5a10" rx="2"/>
+  <rect x="152" y="148" width="24" height="16" fill="#2a7a1a" rx="2"/>
+
+  <!-- Tree 3 -->
+  <rect x="740" y="165" width="8" height="45" fill="#4a2810"/>
+  <rect x="722" y="140" width="44" height="30" fill="#2a6b1a" rx="2"/>
+  <rect x="728" y="130" width="32" height="18" fill="#3a8a2a" rx="2"/>
+
+  <!-- Tree 4 -->
+  <rect x="830" y="175" width="8" height="35" fill="#4a2810"/>
+  <rect x="816" y="155" width="36" height="24" fill="#1a5a10" rx="2"/>
+  <rect x="822" y="145" width="24" height="16" fill="#2a7a1a" rx="2"/>
+
+  <!-- Pixelated house/cabin -->
+  <rect x="370" y="185" width="60" height="35" fill="#8B6914"/>
+  <rect x="365" y="175" width="70" height="14" fill="#6B4914"/>
+  <polygon points="360,178 400,155 440,178" fill="#8B4513"/>
+  <!-- Door -->
+  <rect x="392" y="200" width="16" height="20" fill="#5a3a10"/>
+  <!-- Window -->
+  <rect x="375" y="192" width="10" height="10" fill="#ffdd88" opacity="0.8"/>
+  <rect x="415" y="192" width="10" height="10" fill="#ffdd88" opacity="0.8"/>
+  <!-- Chimney -->
+  <rect x="420" y="155" width="8" height="20" fill="#666"/>
+  <!-- Smoke -->
+  <circle cx="424" cy="148" r="4" fill="#888" opacity="0.3"/>
+  <circle cx="420" cy="140" r="5" fill="#888" opacity="0.2"/>
+  <circle cx="426" cy="132" r="6" fill="#888" opacity="0.1"/>
+
+  <!-- Crafting table -->
+  <rect x="510" y="204" width="24" height="16" fill="#9B7B3A"/>
+  <rect x="512" y="200" width="20" height="6" fill="#B8943A"/>
+  <rect x="514" y="206" width="4" height="14" fill="#6B5014"/>
+  <rect x="526" y="206" width="4" height="14" fill="#6B5014"/>
+
+  <!-- Anvil -->
+  <rect x="286" y="208" width="20" height="6" fill="#555"/>
+  <rect x="290" y="206" width="12" height="4" fill="#666"/>
+  <rect x="292" y="214" width="8" height="6" fill="#555"/>
+
+  <!-- Grass tufts -->
+  <rect x="100" y="208" width="3" height="6" fill="#4a8a2a"/>
+  <rect x="105" y="206" width="3" height="8" fill="#3a7a1a"/>
+  <rect x="250" y="207" width="3" height="7" fill="#4a8a2a"/>
+  <rect x="480" y="208" width="3" height="6" fill="#4a8a2a"/>
+  <rect x="600" y="207" width="3" height="7" fill="#3a7a1a"/>
+  <rect x="680" y="208" width="3" height="6" fill="#4a8a2a"/>
+
+  <!-- Ore blocks in ground -->
+  <rect x="200" y="250" width="10" height="10" fill="#444" rx="1"/>
+  <rect x="202" y="252" width="3" height="3" fill="#c8a832"/>
+  <rect x="206" y="254" width="2" height="2" fill="#c8a832"/>
+  <rect x="650" y="260" width="10" height="10" fill="#444" rx="1"/>
+  <rect x="652" y="262" width="3" height="3" fill="#8B4513"/>
+  <rect x="656" y="264" width="2" height="2" fill="#8B4513"/>
+
+  <!-- Dirt/stone layers -->
+  <rect x="0" y="240" width="900" height="2" fill="#3a2a10" opacity="0.3"/>
+  <rect x="0" y="265" width="900" height="80" fill="#555" opacity="0.2"/>
+
+  <!-- Main title -->
+  <text x="450" y="105" font-family="Georgia, 'Times New Roman', serif" font-size="48" font-weight="bold"
+        fill="url(#title-gradient)" text-anchor="middle" filter="url(#shadow)">
+    Vintage Story Modding
+  </text>
+
+  <!-- Decorative line under title -->
+  <line x1="220" y1="118" x2="680" y2="118" stroke="#f0d080" stroke-width="1.5" opacity="0.6"/>
+  <circle cx="450" cy="118" r="3" fill="#f0d080" opacity="0.8"/>
+  <circle cx="220" cy="118" r="2" fill="#f0d080" opacity="0.6"/>
+  <circle cx="680" cy="118" r="2" fill="#f0d080" opacity="0.6"/>
+
+  <!-- Subtitle -->
+  <text x="450" y="280" font-family="'Segoe UI', Arial, sans-serif" font-size="16"
+        fill="#e0e0e0" text-anchor="middle" letter-spacing="4">
+    VINTAGE ESSENTIALS — QUALITY OF LIFE MODS
+  </text>
+
+  <!-- Decorative border -->
+  <rect x="0" y="0" width="900" height="320" fill="none" stroke="#f0d080" stroke-width="2" opacity="0.3" rx="8"/>
+  <rect x="4" y="4" width="892" height="312" fill="none" stroke="#f0d080" stroke-width="0.5" opacity="0.2" rx="6"/>
+</svg>
