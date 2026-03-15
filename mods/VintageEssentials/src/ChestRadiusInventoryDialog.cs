@@ -487,7 +487,7 @@ namespace VintageEssentials
         private void OnMouseUpEvent(MouseEvent e)
         {
             // Check if this is a shift-click
-            if (!e.ShiftPressed) return;
+            if (!capi.Input.KeyboardKeyState[(int)GlKeys.ShiftLeft] && !capi.Input.KeyboardKeyState[(int)GlKeys.ShiftRight]) return;
             
             // Only handle left clicks
             if (e.Button != EnumMouseButton.Left) return;
