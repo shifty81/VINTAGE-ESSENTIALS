@@ -5,6 +5,16 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 ## [Unreleased]
 
 ### Fixed
+- **RTP Safe Location — Still Failing to Find Safe Ground** — `VintageEssentialsModSystem`:
+  - **3×3 chunk loading**: Now force-loads a 3×3 grid of chunk columns around the target instead of a single column, ensuring proper world generation (terrain gen depends on neighbor chunks).
+  - **Increased wait time**: Extended chunk generation delay from 2 seconds to 5 seconds to allow the server enough time to generate terrain at distant unvisited locations.
+  - **Passable block detection**: Surface check now accepts plants, snow, and leaves as passable blocks above the ground, not just air. Previously, landing on terrain with tall grass or snow would incorrectly report "no safe location."
+  - **Lava exclusion**: Lava blocks are now excluded from valid ground surfaces (previously only liquid was excluded, but Lava is a separate material).
+  - **More retry attempts**: Increased max attempts from 5 to 10 for better success rate.
+  - **Lateral offset on retries**: Each attempt now applies a random ±500 block perpendicular offset so retries explore different terrain rather than testing positions along the same line.
+  - **Unloaded chunk detection**: Added logging when an entire column returns no solid blocks, indicating the chunk may not have loaded in time.
+  - **Debug logging**: RTP retry attempts are now logged with position info for server-side troubleshooting.
+
 - **Player Inventory Sort — Wrong Inventory Class** — `PlayerInventorySortDialog.SortPlayerInventory()`:
   - Was calling `GetOwnInventory(GlobalConstants.characterInvClassName)` which returns the player's clothing and armor slots, causing `Shift+S` to silently sort armor/clothing slots instead of bag items.
   - Now correctly sorts the `backpackInvClassName` ("backpack") inventory, which contains the player's bag storage slots.

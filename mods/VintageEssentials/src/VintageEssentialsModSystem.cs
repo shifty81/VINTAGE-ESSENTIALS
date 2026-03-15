@@ -228,7 +228,7 @@ namespace VintageEssentials
 
         private void TryRtpAttempt(IServerPlayer player, string direction, int attempt)
         {
-            int maxAttempts = 5;
+            int maxAttempts = 10;
             if (attempt >= maxAttempts)
             {
                 player.SendMessage(GlobalConstants.GeneralChatGroup, "Failed to find a safe location after multiple attempts. Please try again.", EnumChatType.CommandError);
@@ -241,42 +241,57 @@ namespace VintageEssentials
             Random rand = new Random();
             double distance = rand.NextDouble() * (maxDistance - minDistance) + minDistance;
 
+            // Add a random perpendicular offset (±500 blocks) so retries explore different terrain
+            double lateralOffset = (rand.NextDouble() - 0.5) * 1000;
+
             Vec3d currentPos = player.Entity.Pos.XYZ;
             double newX = currentPos.X;
             double newZ = currentPos.Z;
 
-            // Calculate new position based on direction
+            // Calculate new position based on direction with perpendicular offset
             // In Vintage Story, negative Z is North, positive Z is South
             switch (direction)
             {
                 case "north":
                     newZ -= distance;
+                    newX += lateralOffset;
                     break;
                 case "south":
                     newZ += distance;
+                    newX += lateralOffset;
                     break;
                 case "east":
                     newX += distance;
+                    newZ += lateralOffset;
                     break;
                 case "west":
                     newX -= distance;
+                    newZ += lateralOffset;
                     break;
             }
 
-            // Force-load the chunk column at the target location so block data is available
+            // Force-load a 3x3 grid of chunk columns around the target so terrain
+            // generates properly (world gen often needs neighbor chunks).
             int chunkSize = GlobalConstants.ChunkSize;
-            int chunkX = (int)Math.Floor(newX / chunkSize);
-            int chunkZ = (int)Math.Floor(newZ / chunkSize);
+            int centerChunkX = (int)Math.Floor(newX / chunkSize);
+            int centerChunkZ = (int)Math.Floor(newZ / chunkSize);
 
-            serverApi.WorldManager.LoadChunkColumnPriority(chunkX, chunkZ);
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dz = -1; dz <= 1; dz++)
+                {
+                    serverApi.WorldManager.LoadChunkColumnPriority(centerChunkX + dx, centerChunkZ + dz);
+                }
+            }
 
             // Capture values for the closure
             double capturedX = newX;
             double capturedZ = newZ;
             double capturedDistance = distance;
+            int capturedAttempt = attempt;
 
-            // Wait for the chunk to generate/load before checking block data.
-            // 2 seconds gives the server enough time to generate terrain for a new chunk column.
+            // Wait for chunks to generate/load before checking block data.
+            // 5 seconds gives the server time to generate terrain for new chunk columns at far distances.
             serverApi.Event.RegisterCallback((deltaTime) =>
             {
                 // Verify the player is still connected
@@ -298,16 +313,33 @@ namespace VintageEssentials
                 }
                 else
                 {
+                    serverApi.Logger.Debug($"VintageEssentials: RTP attempt {capturedAttempt + 1}/{maxAttempts} at {capturedX:F0},{capturedZ:F0} — no safe surface found, retrying...");
                     // Retry with a new random position
-                    TryRtpAttempt(player, direction, attempt + 1);
+                    TryRtpAttempt(player, direction, capturedAttempt + 1);
                 }
-            }, 2000);
+            }, 5000);
+        }
+
+        /// <summary>
+        /// Checks whether a block is passable (a player can occupy the space).
+        /// Returns true for air, plants, snow layers, leaves, and other non-solid blocks.
+        /// </summary>
+        private bool IsBlockPassable(Block block)
+        {
+            if (block == null || block.Id == 0) return true;
+
+            var mat = block.BlockMaterial;
+            return mat == EnumBlockMaterial.Air
+                || mat == EnumBlockMaterial.Plant
+                || mat == EnumBlockMaterial.Leaves
+                || mat == EnumBlockMaterial.Snow;
         }
 
         private int FindSurfaceY(BlockPos pos)
         {
             IBlockAccessor blockAccessor = serverApi.World.BlockAccessor;
             int mapHeight = serverApi.World.BlockAccessor.MapSizeY;
+            bool foundAnySolidBlock = false;
 
             // Start from the top and search downward for the first solid block
             for (int y = mapHeight - 1; y > 0; y--)
@@ -317,20 +349,32 @@ namespace VintageEssentials
 
                 if (block != null && block.Id != 0
                     && block.BlockMaterial != EnumBlockMaterial.Air
-                    && block.BlockMaterial != EnumBlockMaterial.Liquid)
+                    && block.BlockMaterial != EnumBlockMaterial.Liquid
+                    && block.BlockMaterial != EnumBlockMaterial.Lava)
                 {
-                    // Found a solid non-liquid block, check if there's air above it (2 blocks for player height)
+                    foundAnySolidBlock = true;
+
+                    // Skip passable surface blocks (plants, snow, leaves) — they're not solid ground
+                    if (IsBlockPassable(block)) continue;
+
+                    // Found a solid non-liquid block, check if there's space above for the player (2 blocks)
                     BlockPos checkPosAbove = new BlockPos(checkPos.X, checkPos.Y + 1, checkPos.Z);
                     BlockPos checkPosAbove2 = new BlockPos(checkPos.X, checkPos.Y + 2, checkPos.Z);
                     Block blockAbove = blockAccessor.GetBlock(checkPosAbove);
                     Block blockAbove2 = blockAccessor.GetBlock(checkPosAbove2);
-                    
-                    if (blockAbove != null && blockAbove.BlockMaterial == EnumBlockMaterial.Air &&
-                        blockAbove2 != null && blockAbove2.BlockMaterial == EnumBlockMaterial.Air)
+
+                    if (IsBlockPassable(blockAbove) && IsBlockPassable(blockAbove2))
                     {
                         return y;
                     }
                 }
+            }
+
+            // If we scanned the entire column and found no solid blocks at all, the chunk
+            // is likely not loaded yet (GetBlock returns air for unloaded chunks).
+            if (!foundAnySolidBlock)
+            {
+                serverApi.Logger.Debug($"VintageEssentials: FindSurfaceY at {pos.X},{pos.Z} found no solid blocks — chunk may not be loaded");
             }
 
             return -1; // No safe location found
