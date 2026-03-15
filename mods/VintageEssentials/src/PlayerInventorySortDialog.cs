@@ -23,14 +23,13 @@ namespace VintageEssentials
             IPlayer player = capi.World.Player;
             if (player?.InventoryManager == null) return;
 
-            // Get the player's inventory
-            IInventory playerInv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+            // Sort the backpack (bag storage) inventory.
+            // hotBarInvClassName ("hotbar") is intentionally left in place.
+            // characterInvClassName ("character") holds clothing/armor — never sort that.
+            IInventory playerInv = player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
             if (playerInv == null) return;
 
-            // Get the offhand slot for comparison
-            ItemSlot offhandSlot = player.Entity?.LeftHandItemSlot;
-
-            // Collect all non-empty slots and their contents (excluding hotbar and offhand)
+            // Collect all non-empty, non-locked slots and their contents
             List<ItemSlot> slots = new List<ItemSlot>();
             List<ItemStack> stacks = new List<ItemStack>();
 
@@ -40,11 +39,7 @@ namespace VintageEssentials
             int slotIndex = 0;
             foreach (ItemSlot slot in playerInv)
             {
-                // Skip hotbar slots (0-9) and offhand slot
-                bool isHotbarSlot = slotIndex < 10;
-                bool isOffhandSlot = (offhandSlot != null && slot == offhandSlot);
-                
-                if (!isHotbarSlot && !isOffhandSlot && slot != null && !slot.Empty && slot.Itemstack != null)
+                if (slot != null && !slot.Empty && slot.Itemstack != null)
                 {
                     // Only add to sort list if slot is not locked
                     if (!lockedSlots.Contains(slotIndex))
@@ -53,7 +48,7 @@ namespace VintageEssentials
                         stacks.Add(slot.Itemstack.Clone());
                     }
                 }
-                
+
                 slotIndex++;
             }
 

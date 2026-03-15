@@ -5,6 +5,22 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 ## [Unreleased]
 
 ### Fixed
+- **Player Inventory Sort — Wrong Inventory Class** — `PlayerInventorySortDialog.SortPlayerInventory()`:
+  - Was calling `GetOwnInventory(GlobalConstants.characterInvClassName)` which returns the player's clothing and armor slots, causing `Shift+S` to silently sort armor/clothing slots instead of bag items.
+  - Now correctly sorts the `backpackInvClassName` ("backpack") inventory, which contains the player's bag storage slots.
+  - Removed the now-unnecessary "skip hotbar slots (0-9)" guard since the backpack inventory does not contain hotbar slots.
+
+- **Chest Radius — Deposit All / Take All operating on wrong inventory** — `ChestRadiusInventoryDialog`:
+  - `OnDepositClicked()` and `OnTakeAllClicked()` were calling `GetOwnInventory(GlobalConstants.characterInvClassName)`, causing the buttons to iterate over armor/clothing slots instead of the player's item slots.
+  - Both methods now build a combined slot list from `hotBarInvClassName` ("hotbar") and `backpackInvClassName` ("backpack"), matching the inventory classes used by `PortableCraftingTableDialog`.
+
+- **Chest Radius — Player Inventory Hook operating on wrong inventory** — `ChestRadiusInventoryDialog.SetupPlayerInventoryHook()` / `CleanupPlayerInventoryHook()`:
+  - Was subscribing to `SlotModified` on `characterInvClassName`, so the display never refreshed when the player's actual item slots changed.
+  - Now hooks into both `hotBarInvClassName` and `backpackInvClassName` for complete coverage.
+
+## [1.6.0] - 2026-03-15
+
+### Fixed
 - **Portable Crafting Table Dialog — Wrong Slots Shown** — `PortableCraftingTableDialog.ComposeDialog()`:
   - All three `AddItemSlotGrid` calls for the block entity inventory used the overload without `indicestoshow`, causing every section (crafting grid, output slot, and storage) to render all 82 inventory slots instead of their respective subsets.
   - Added explicit `int[]` index arrays: crafting grid shows slots 72–80, output slot shows slot 81, and storage shows slots 0–71.

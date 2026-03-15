@@ -295,14 +295,19 @@ namespace VintageEssentials
             IPlayer player = capi.World.Player;
             if (player?.InventoryManager == null) return true;
 
-            // Get the player's main inventory
-            IInventory playerInv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-            if (playerInv == null) return true;
+            // Collect all player item slots (hotbar + backpack).
+            // characterInvClassName ("character") holds clothing/armor — skip it.
+            IInventory hotbarInv = player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
+            IInventory backpackInv = player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
+
+            List<ItemSlot> playerSlots = new List<ItemSlot>();
+            if (hotbarInv != null) foreach (var s in hotbarInv) if (s != null) playerSlots.Add(s);
+            if (backpackInv != null) foreach (var s in backpackInv) if (s != null) playerSlots.Add(s);
 
             int deposited = 0;
             
             // Iterate through player inventory slots
-            foreach (var slot in playerInv)
+            foreach (var slot in playerSlots)
             {
                 if (slot == null || slot.Empty) continue;
                 
@@ -361,9 +366,14 @@ namespace VintageEssentials
             IPlayer player = capi.World.Player;
             if (player?.InventoryManager == null) return true;
 
-            // Get the player's main inventory
-            IInventory playerInv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-            if (playerInv == null) return true;
+            // Collect all player item slots (hotbar + backpack).
+            // characterInvClassName ("character") holds clothing/armor — skip it.
+            IInventory hotbarInv = player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
+            IInventory backpackInv = player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
+
+            List<ItemSlot> playerSlots = new List<ItemSlot>();
+            if (hotbarInv != null) foreach (var s in hotbarInv) if (s != null) playerSlots.Add(s);
+            if (backpackInv != null) foreach (var s in backpackInv) if (s != null) playerSlots.Add(s);
 
             int taken = 0;
 
@@ -373,7 +383,7 @@ namespace VintageEssentials
                 {
                     if (sourceSlot.Empty) continue;
 
-                    foreach (var targetSlot in playerInv)
+                    foreach (var targetSlot in playerSlots)
                     {
                         if (targetSlot == null) continue;
                         
@@ -450,10 +460,12 @@ namespace VintageEssentials
             var player = capi.World.Player;
             if (player?.InventoryManager == null) return;
 
-            var playerInv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-            if (playerInv == null) return;
+            // Monitor both hotbar and backpack inventories for changes
+            var hotbarInv = player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
+            var backpackInv = player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
 
-            playerInv.SlotModified += OnPlayerInventorySlotModified;
+            if (hotbarInv != null) hotbarInv.SlotModified += OnPlayerInventorySlotModified;
+            if (backpackInv != null) backpackInv.SlotModified += OnPlayerInventorySlotModified;
 
             // Additionally, we can register a mouse up event handler to intercept shift-clicks
             capi.Event.MouseUp += OnMouseUpEvent;
@@ -464,10 +476,11 @@ namespace VintageEssentials
             var player = capi.World.Player;
             if (player?.InventoryManager == null) return;
 
-            var playerInv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-            if (playerInv == null) return;
+            var hotbarInv = player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
+            var backpackInv = player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
 
-            playerInv.SlotModified -= OnPlayerInventorySlotModified;
+            if (hotbarInv != null) hotbarInv.SlotModified -= OnPlayerInventorySlotModified;
+            if (backpackInv != null) backpackInv.SlotModified -= OnPlayerInventorySlotModified;
             capi.Event.MouseUp -= OnMouseUpEvent;
         }
 
