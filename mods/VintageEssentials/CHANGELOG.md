@@ -4,6 +4,24 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 
 ## [Unreleased]
 
+### Fixed
+- **Invalid JSON in Storage Patches** — `assets/vintageessentials/patches/blocktypes/storage.json`:
+  - Contained C++ style `//` comments which are invalid in JSON
+  - Container slot patches (chests, storage vessels, crates) were silently failing to load
+  - Replaced with JSON-compliant `_comment` fields
+
+- **Slot Locking Null Reference** — `InventoryLockDialog`:
+  - `TryToggleSlotLock()`, `ToggleLockingMode()`, and `IsSlotLocked()` could crash with a `NullReferenceException` if called before the player entity was initialized
+  - Added null safety checks (`capi?.World?.Player`) in all methods that access `PlayerUID`
+
+- **Slot Locking Logic Error** — `InventoryLockDialog.TryToggleSlotLock()`:
+  - After unlocking a slot, the code checked `IsSlotLocked()` again which was always false, making the max-slots-reached feedback unreachable
+  - Now correctly detects whether a lock attempt failed due to the max slots limit by comparing state before and after the toggle
+
+- **Memory Leak on Dialog Close** — `ChestRadiusInventoryDialog.OnGuiClosed()`:
+  - Nearby container references and slot lists were not cleared when the dialog closed, keeping stale references alive
+  - Now clears `nearbyContainers`, `allSlots`, `filteredSlots`, and `displaySlotToActualSlot` on close
+
 ### Added
 - **Phase 6: Polish & Testing** — UI refinement, bug fixes, and localization consistency:
   - All hardcoded UI strings replaced with `Lang.Get()` localization calls across all dialog classes

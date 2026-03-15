@@ -1,7 +1,6 @@
 [
-  // Chest patches - Note: Wildcards are NOT supported in Vintage Story JSON patches.
-  // Each chest variant (north, east, south, west) must be patched individually.
   {
+    "_comment": "Chest patches - Wildcards are NOT supported in Vintage Story JSON patches. Each chest variant must be patched individually.",
     "op": "replace",
     "path": "/attributes/quantitySlots",
     "value": 32,
@@ -25,9 +24,8 @@
     "value": 32,
     "file": "game:blocktypes/wood/generic/chest-west"
   },
-  
-  // Storage vessel patches - Each material variant must be patched individually
   {
+    "_comment": "Storage vessel patches - Each material variant must be patched individually.",
     "op": "replace",
     "path": "/attributes/quantitySlots",
     "value": 24,
@@ -39,9 +37,8 @@
     "value": 24,
     "file": "game:blocktypes/clay/vessel-burned-raw"
   },
-  
-  // Crate patch
   {
+    "_comment": "Crate patch.",
     "op": "replace",
     "path": "/attributes/quantitySlots",
     "value": 48,
