@@ -8,7 +8,7 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 
 - **`/sethome`** - Sets your home location at your current position
 - **`/home`** - Teleports you to your saved home location
-- **`/rtp <direction>`** - Randomly teleports you 10,000-20,000 blocks in the specified direction (north, south, east, or west)
+- **`/rtp <direction>`** - Randomly teleports you 10,000-20,000 blocks in the specified direction (north/n, south/s, east/e, or west/w)
 
 ### Chest Radius Inventory (NEW!)
 
@@ -205,12 +205,12 @@ Output: `bin/Release/VintageEssentials.zip`
 ### Random Teleport
 
 Use `/rtp` with a direction to explore:
-- `/rtp north` - Teleport 10,000-20,000 blocks north
-- `/rtp south` - Teleport 10,000-20,000 blocks south
-- `/rtp east` - Teleport 10,000-20,000 blocks east
-- `/rtp west` - Teleport 10,000-20,000 blocks west
+- `/rtp north` (or `/rtp n`) - Teleport 10,000-20,000 blocks north
+- `/rtp south` (or `/rtp s`) - Teleport 10,000-20,000 blocks south
+- `/rtp east` (or `/rtp e`) - Teleport 10,000-20,000 blocks east
+- `/rtp west` (or `/rtp w`) - Teleport 10,000-20,000 blocks west
 
-The mod will find a safe landing spot at ground level.
+The mod will force-load terrain at the target location, find a safe landing spot at ground level, and teleport you there. If the first spot isn't safe, it will automatically retry up to 5 times with different random positions.
 
 ### Chest Radius Inventory
 

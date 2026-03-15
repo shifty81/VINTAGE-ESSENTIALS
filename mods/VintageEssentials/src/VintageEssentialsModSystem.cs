@@ -203,9 +203,36 @@ namespace VintageEssentials
             }
 
             direction = direction.ToLower();
+
+            // Accept short direction aliases
+            switch (direction)
+            {
+                case "n": direction = "north"; break;
+                case "s": direction = "south"; break;
+                case "e": direction = "east"; break;
+                case "w": direction = "west"; break;
+            }
+
             if (direction != "north" && direction != "south" && direction != "east" && direction != "west")
             {
                 return TextCommandResult.Error("Invalid direction. Use: north, south, east, or west");
+            }
+
+            player.SendMessage(GlobalConstants.GeneralChatGroup, "Searching for a safe location...", EnumChatType.Notification);
+
+            // Start async search with retry logic
+            TryRtpAttempt(player, direction, 0);
+
+            return TextCommandResult.Success();
+        }
+
+        private void TryRtpAttempt(IServerPlayer player, string direction, int attempt)
+        {
+            int maxAttempts = 5;
+            if (attempt >= maxAttempts)
+            {
+                player.SendMessage(GlobalConstants.GeneralChatGroup, "Failed to find a safe location after multiple attempts. Please try again.", EnumChatType.CommandError);
+                return;
             }
 
             // Calculate random distance between 10,000 and 20,000 blocks
@@ -236,20 +263,45 @@ namespace VintageEssentials
                     break;
             }
 
-            // Find a safe Y coordinate (ground level)
-            BlockPos targetPos = new BlockPos((int)newX, 0, (int)newZ);
-            int surfaceY = FindSurfaceY(targetPos);
+            // Force-load the chunk column at the target location so block data is available
+            int chunkSize = GlobalConstants.ChunkSize;
+            int chunkX = (int)Math.Floor(newX / chunkSize);
+            int chunkZ = (int)Math.Floor(newZ / chunkSize);
 
-            if (surfaceY > 0)
+            serverApi.WorldManager.LoadChunkColumnPriority(chunkX, chunkZ);
+
+            // Capture values for the closure
+            double capturedX = newX;
+            double capturedZ = newZ;
+            double capturedDistance = distance;
+
+            // Wait for the chunk to generate/load before checking block data.
+            // 2 seconds gives the server enough time to generate terrain for a new chunk column.
+            serverApi.Event.RegisterCallback((deltaTime) =>
             {
-                Vec3d teleportPos = new Vec3d(newX, surfaceY + 1, newZ);
-                player.Entity.TeleportTo(teleportPos);
-                return TextCommandResult.Success($"Randomly warped {direction} to {newX:F0}, {surfaceY}, {newZ:F0} ({distance:F0} blocks away)");
-            }
-            else
-            {
-                return TextCommandResult.Error("Failed to find a safe location. Please try again.");
-            }
+                // Verify the player is still connected
+                if (player?.Entity == null || player.ConnectionState != EnumClientState.Playing)
+                {
+                    return;
+                }
+
+                BlockPos targetPos = new BlockPos((int)capturedX, 0, (int)capturedZ);
+                int surfaceY = FindSurfaceY(targetPos);
+
+                if (surfaceY > 0)
+                {
+                    Vec3d teleportPos = new Vec3d(capturedX, surfaceY + 1, capturedZ);
+                    player.Entity.TeleportTo(teleportPos);
+                    player.SendMessage(GlobalConstants.GeneralChatGroup,
+                        $"Randomly warped {direction} to {capturedX:F0}, {surfaceY}, {capturedZ:F0} ({capturedDistance:F0} blocks away)",
+                        EnumChatType.CommandSuccess);
+                }
+                else
+                {
+                    // Retry with a new random position
+                    TryRtpAttempt(player, direction, attempt + 1);
+                }
+            }, 2000);
         }
 
         private int FindSurfaceY(BlockPos pos)
@@ -263,9 +315,11 @@ namespace VintageEssentials
                 BlockPos checkPos = new BlockPos(pos.X, y, pos.Z);
                 Block block = blockAccessor.GetBlock(checkPos);
 
-                if (block != null && block.Id != 0 && block.BlockMaterial != EnumBlockMaterial.Air)
+                if (block != null && block.Id != 0
+                    && block.BlockMaterial != EnumBlockMaterial.Air
+                    && block.BlockMaterial != EnumBlockMaterial.Liquid)
                 {
-                    // Found a solid block, check if there's air above it
+                    // Found a solid non-liquid block, check if there's air above it (2 blocks for player height)
                     BlockPos checkPosAbove = new BlockPos(checkPos.X, checkPos.Y + 1, checkPos.Z);
                     BlockPos checkPosAbove2 = new BlockPos(checkPos.X, checkPos.Y + 2, checkPos.Z);
                     Block blockAbove = blockAccessor.GetBlock(checkPosAbove);
