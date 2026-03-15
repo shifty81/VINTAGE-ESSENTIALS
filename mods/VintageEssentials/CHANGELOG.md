@@ -5,6 +5,28 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 ## [Unreleased]
 
 ### Fixed
+- **Portable Crafting Table Dialog — Wrong Slots Shown** — `PortableCraftingTableDialog.ComposeDialog()`:
+  - All three `AddItemSlotGrid` calls for the block entity inventory used the overload without `indicestoshow`, causing every section (crafting grid, output slot, and storage) to render all 82 inventory slots instead of their respective subsets.
+  - Added explicit `int[]` index arrays: crafting grid shows slots 72–80, output slot shows slot 81, and storage shows slots 0–71.
+
+- **Portable Crafting Table Dialog — Wrong Player Inventory Shown** — `PortableCraftingTableDialog.ComposeDialog()`:
+  - Used `GlobalConstants.characterInvClassName` ("character") which contains the player's clothing and armor slots, not the hotbar or bag storage.
+  - Now correctly uses `GlobalConstants.hotBarInvClassName` ("hotbar") for the hotbar row and `GlobalConstants.backpackInvClassName` ("backpack") for the bag-storage rows.
+  - Backpack display updated from 10×3 to 10×4 rows to match the standard backpack layout.
+
+- **Crafting Ingredients Not Consumed** — `BlockEntityPortableCraftingTable`:
+  - Taking the crafted item from the output slot did not consume the ingredients in the crafting grid, allowing infinite free crafting.
+  - Added `outputSetBySystem` flag (set during `UpdateCraftingOutput()`) and `isHandlingOutputTaken` re-entrancy guard.
+  - `OnSlotModified()` now detects when the output slot is emptied by the player (not by the system) and calls `HandleOutputTaken()`, which consumes one unit from each occupied crafting grid slot before refreshing the output preview.
+
+- **Portable Crafting Table Block Info — Hardcoded Text** — `BlockPortableCraftingTable.GetPlacedBlockInfo()`:
+  - The storage-usage tooltip was a hardcoded English string.
+  - Now uses `Lang.Get("vintageessentials:crafttable-storageinfo", usedSlots, totalSlots)` for proper localization support.
+
+### Added
+- **Localization key** `vintageessentials:crafttable-storageinfo` in `en.json` for the placed block storage info tooltip ("Storage: {0}/{1} slots used\nShift+Right-click to pick up").
+
+### Fixed
 - **Invalid JSON in Storage Patches** — `assets/vintageessentials/patches/blocktypes/storage.json`:
   - Contained C++ style `//` comments which are invalid in JSON
   - Container slot patches (chests, storage vessels, crates) were silently failing to load

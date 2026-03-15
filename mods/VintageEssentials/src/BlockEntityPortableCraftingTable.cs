@@ -31,6 +31,15 @@ namespace VintageEssentials
         /// </summary>
         public bool PreventDropOnRemoval { get; set; } = false;
 
+        /// <summary>Set to true while UpdateCraftingOutput() is writing to the output slot,
+        /// so that the slot-modified handler can distinguish programmatic writes from player
+        /// interactions (which should trigger ingredient consumption).</summary>
+        private bool outputSetBySystem = false;
+
+        /// <summary>Re-entrancy guard: true while HandleOutputTaken() is running, which
+        /// causes all further SlotModified events to be suppressed.</summary>
+        private bool isHandlingOutputTaken = false;
+
         public override InventoryBase Inventory => inventory;
         public override string InventoryClassName => "portablecraftingtable";
 
@@ -67,11 +76,64 @@ namespace VintageEssentials
 
         private void OnSlotModified(int slotId)
         {
-            // When a crafting grid slot changes, update the output
+            // Suppress all events while HandleOutputTaken is running (avoids re-entrancy)
+            if (isHandlingOutputTaken) return;
+
             if (slotId >= CraftGridSlotStart && slotId < OutputSlotStart)
             {
+                // A crafting grid slot changed – refresh the output preview
                 UpdateCraftingOutput();
             }
+            else if (slotId == OutputSlotStart && !outputSetBySystem)
+            {
+                // The output slot was changed by the player (not by UpdateCraftingOutput).
+                // If the slot is now empty the player just took the crafted item, so we must
+                // consume one set of ingredients from the crafting grid.
+                if (inventory[OutputSlotStart].Empty)
+                {
+                    isHandlingOutputTaken = true;
+                    try
+                    {
+                        HandleOutputTaken();
+                    }
+                    finally
+                    {
+                        isHandlingOutputTaken = false;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the player removes the crafted item from the output slot.
+        /// Consumes one unit of each occupied crafting grid slot and refreshes
+        /// the output preview.
+        /// </summary>
+        private void HandleOutputTaken()
+        {
+            // Build array of live references to the current crafting grid slots.
+            // These point directly into the inventory, so ResolveMatchingRecipe and
+            // the consumption loop both operate on the same up-to-date state.
+            ItemSlot[] gridSlots = new ItemSlot[CRAFT_GRID_SLOTS];
+            for (int i = 0; i < CRAFT_GRID_SLOTS; i++)
+                gridSlots[i] = inventory[CraftGridSlotStart + i];
+
+            // Only consume if a valid recipe is currently in the grid
+            if (ResolveMatchingRecipe(gridSlots) != null)
+            {
+                for (int i = 0; i < CRAFT_GRID_SLOTS; i++)
+                {
+                    ItemSlot slot = gridSlots[i];
+                    if (slot != null && !slot.Empty)
+                    {
+                        slot.TakeOut(1);
+                        slot.MarkDirty();
+                    }
+                }
+            }
+
+            // Refresh output based on the (now reduced) grid contents
+            UpdateCraftingOutput();
         }
 
         /// <summary>
@@ -92,6 +154,9 @@ namespace VintageEssentials
             ItemSlot outputSlot = inventory[OutputSlotStart];
             GridRecipe matchedRecipe = ResolveMatchingRecipe(gridSlots);
 
+            // Guard: treat this write as a system operation so OnSlotModified will not
+            // treat it as a player taking the item.
+            outputSetBySystem = true;
             if (matchedRecipe != null)
             {
                 ItemStack outputStack = matchedRecipe.Output.ResolvedItemstack?.Clone();
@@ -103,6 +168,7 @@ namespace VintageEssentials
             }
 
             outputSlot.MarkDirty();
+            outputSetBySystem = false;
         }
 
         private GridRecipe ResolveMatchingRecipe(ItemSlot[] gridSlots)

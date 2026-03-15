@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -88,18 +89,27 @@ namespace VintageEssentials
             ElementBounds playerLabelBounds = ElementBounds.Fixed(0, yOffset, elemWidth, 20);
             yOffset += 25;
 
-            // ---- Player inventory (hotbar 10×1, backpack 10×3) ----
+            // ---- Player inventory (hotbar 10×1, backpack 10×4) ----
             ElementBounds playerHotbarBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 0, yOffset, 10, 1);
             yOffset += slotSize + pad;
-            ElementBounds playerBackpackBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 0, yOffset, 10, 3);
+            ElementBounds playerBackpackBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 0, yOffset, 10, 4);
 
             bgBounds.BothSizing = ElementSizing.FitToChildren;
             bgBounds.WithChildren(craftLabelBounds, craftGridBounds, arrowBounds, outputSlotBounds,
                                   pullBtnBounds, handbookBtnBounds, storageLabelBounds, storageSlotBounds,
                                   playerLabelBounds, playerHotbarBounds, playerBackpackBounds);
 
-            // Get the player's own inventory for display
-            IInventory playerInv = capi.World.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+            // ---- Slot index arrays ----
+            // Crafting grid: slots CraftGridSlotStart … CraftGridSlotStart + 8
+            int[] craftGridIndices = Enumerable.Range(blockEntity.CraftGridSlotStart, BlockEntityPortableCraftingTable.CRAFT_GRID_SLOTS).ToArray();
+            // Output slot
+            int[] outputIndices = new int[] { blockEntity.OutputSlotStart };
+            // Storage: slots StorageSlotStart … StorageSlotStart + StorageSlotCount - 1
+            int[] storageIndices = Enumerable.Range(blockEntity.StorageSlotStart, blockEntity.StorageSlotCount).ToArray();
+
+            // ---- Player inventories ----
+            IInventory hotbarInv = capi.World.Player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
+            IInventory backpackInv = capi.World.Player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
 
             // Build slot ranges for the block entity inventory
             // Slots 0-71 = storage, 72-80 = crafting grid, 81 = output
@@ -109,20 +119,20 @@ namespace VintageEssentials
                 .BeginChildElements(bgBounds)
                     // Crafting section
                     .AddStaticText(Lang.Get("vintageessentials:crafttable-craftgrid"), CairoFont.WhiteDetailText(), craftLabelBounds)
-                    .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, CRAFT_GRID_SIZE, craftGridBounds, "craftGrid")
+                    .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, CRAFT_GRID_SIZE, craftGridIndices, craftGridBounds, "craftGrid")
                     .AddStaticText("→", CairoFont.WhiteDetailText().WithFontSize(24), arrowBounds)
-                    .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, 1, outputSlotBounds, "outputSlot")
+                    .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, 1, outputIndices, outputSlotBounds, "outputSlot")
                     .AddSmallButton(Lang.Get("vintageessentials:crafttable-pull"), OnPullFromStorage, pullBtnBounds, EnumButtonStyle.Normal, "pullBtn")
                     .AddSmallButton(Lang.Get("vintageessentials:crafttable-handbook"), OnOpenHandbook, handbookBtnBounds, EnumButtonStyle.Normal, "handbookBtn")
 
                     // Storage section
                     .AddStaticText(Lang.Get("vintageessentials:crafttable-storage"), CairoFont.WhiteDetailText(), storageLabelBounds)
-                    .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, STORAGE_COLS, storageSlotBounds, "storageSlots")
+                    .AddItemSlotGrid(blockEntity.Inventory, SendInvPacket, STORAGE_COLS, storageIndices, storageSlotBounds, "storageSlots")
 
                     // Player inventory
                     .AddStaticText(Lang.Get("vintageessentials:crafttable-playerinv"), CairoFont.WhiteDetailText(), playerLabelBounds)
-                    .AddItemSlotGrid(playerInv, SendInvPacket, 10, playerHotbarBounds, "playerHotbar")
-                    .AddItemSlotGrid(playerInv, SendInvPacket, 10, playerBackpackBounds, "playerBackpack")
+                    .AddItemSlotGrid(hotbarInv, SendInvPacket, 10, playerHotbarBounds, "playerHotbar")
+                    .AddItemSlotGrid(backpackInv, SendInvPacket, 10, playerBackpackBounds, "playerBackpack")
                 .EndChildElements()
                 .Compose();
         }
