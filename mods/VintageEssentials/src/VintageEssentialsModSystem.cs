@@ -275,8 +275,9 @@ namespace VintageEssentials
             double capturedZ = newZ;
             double capturedDistance = distance;
 
-            // Wait for the chunk to load, then check for a safe surface
-            serverApi.Event.RegisterCallback((dt) =>
+            // Wait for the chunk to generate/load before checking block data.
+            // 2 seconds gives the server enough time to generate terrain for a new chunk column.
+            serverApi.Event.RegisterCallback((deltaTime) =>
             {
                 // Verify the player is still connected
                 if (player?.Entity == null || player.ConnectionState != EnumClientState.Playing)
