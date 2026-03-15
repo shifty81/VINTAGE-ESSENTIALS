@@ -435,6 +435,11 @@ namespace VintageEssentials
             base.OnGuiClosed();
             // Clean up player inventory hook
             CleanupPlayerInventoryHook();
+            // Clear references to prevent memory leaks
+            nearbyContainers.Clear();
+            allSlots.Clear();
+            filteredSlots.Clear();
+            displaySlotToActualSlot.Clear();
         }
 
         private void SetupPlayerInventoryHook()

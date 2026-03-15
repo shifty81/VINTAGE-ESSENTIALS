@@ -35,6 +35,7 @@ namespace VintageEssentials
             
             if (lockingMode)
             {
+                if (capi?.World?.Player == null) return;
                 string playerUid = capi.World.Player.PlayerUID;
                 int lockedCount = lockedSlotsManager.GetLockedSlotsCount(playerUid);
                 int maxSlots = config.MaxLockedSlots;
@@ -49,26 +50,32 @@ namespace VintageEssentials
         public bool TryToggleSlotLock(int slotId)
         {
             if (!lockingMode) return false;
+            if (capi?.World?.Player == null) return false;
 
             string playerUid = capi.World.Player.PlayerUID;
+
+            // Check if the slot is currently locked
+            bool wasLocked = lockedSlotsManager.IsSlotLocked(playerUid, slotId);
+
+            // ToggleSlotLock returns true if the slot is now locked, false otherwise.
+            // It also returns false when the max locked slots limit is reached
+            // and the slot could not be locked.
             bool nowLocked = lockedSlotsManager.ToggleSlotLock(playerUid, slotId);
             
             if (nowLocked)
             {
                 capi.ShowChatMessage(Lang.Get("vintageessentials:lock-slot-locked", slotId));
             }
+            else if (wasLocked)
+            {
+                // Was locked before, now unlocked
+                capi.ShowChatMessage(Lang.Get("vintageessentials:lock-slot-unlocked", slotId));
+            }
             else
             {
-                int lockedCount = lockedSlotsManager.GetLockedSlotsCount(playerUid);
-                if (lockedSlotsManager.IsSlotLocked(playerUid, slotId))
-                {
-                    capi.ShowChatMessage(Lang.Get("vintageessentials:lock-max-reached", config.MaxLockedSlots));
-                    return false;
-                }
-                else
-                {
-                    capi.ShowChatMessage(Lang.Get("vintageessentials:lock-slot-unlocked", slotId));
-                }
+                // Was not locked, and still not locked — max slots reached
+                capi.ShowChatMessage(Lang.Get("vintageessentials:lock-max-reached", config.MaxLockedSlots));
+                return false;
             }
             
             return true;
@@ -76,6 +83,7 @@ namespace VintageEssentials
 
         public bool IsSlotLocked(int slotId)
         {
+            if (capi?.World?.Player == null) return false;
             string playerUid = capi.World.Player.PlayerUID;
             return lockedSlotsManager.IsSlotLocked(playerUid, slotId);
         }
