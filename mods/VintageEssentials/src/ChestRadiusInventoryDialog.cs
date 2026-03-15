@@ -597,7 +597,7 @@ namespace VintageEssentials
         }
 
         // Override to handle transferring from this slot to another
-        public override int TryPutInto(IWorldAccessor world, ItemSlot sinkSlot)
+        public override int TryPutInto(IWorldAccessor world, ItemSlot sinkSlot, int quantity = 1)
         {
             if (this.Empty || dialog == null) return 0;
 
