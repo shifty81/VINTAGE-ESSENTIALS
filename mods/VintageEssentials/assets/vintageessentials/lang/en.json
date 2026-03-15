@@ -77,6 +77,7 @@
   "vintageessentials:crafttable-pickup-help": "Shift+Right-click to pick up",
   "vintageessentials:crafttable-pickedup": "Crafting table picked up with contents",
   "vintageessentials:crafttable-placed": "Crafting table placed with restored contents",
+  "vintageessentials:crafttable-storageinfo": "Storage: {0}/{1} slots used\nShift+Right-click to pick up",
   "vintageessentials:crafttable-autofill-success": "Auto-filled {0} ingredients from storage",
   "vintageessentials:crafttable-autofill-missing": "Missing ingredients - not all items available in storage or nearby containers"
 }

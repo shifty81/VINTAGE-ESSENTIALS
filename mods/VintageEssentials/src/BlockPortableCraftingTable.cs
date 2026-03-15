@@ -1,5 +1,6 @@
 using System;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 
@@ -91,7 +92,7 @@ namespace VintageEssentials
             {
                 int usedSlots = be.GetUsedSlotCount();
                 int totalSlots = be.GetTotalSlotCount();
-                return $"Storage: {usedSlots}/{totalSlots} slots used\nShift+Right-click to pick up";
+                return Lang.Get("vintageessentials:crafttable-storageinfo", usedSlots, totalSlots);
             }
 
             return base.GetPlacedBlockInfo(world, pos, forPlayer);
