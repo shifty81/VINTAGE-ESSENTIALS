@@ -49,10 +49,13 @@ namespace VintageEssentials
             RegisterKeybinds();
 
             // Register client chat command for config
-            clientApi.RegisterCommand("veconfig", "Opens VintageEssentials configuration", "", (id, args) =>
-            {
-                configDialog.TryOpen();
-            });
+            clientApi.ChatCommands.Create("veconfig")
+                .WithDescription("Opens VintageEssentials configuration")
+                .HandleWith(args =>
+                {
+                    configDialog.TryOpen();
+                    return TextCommandResult.Success();
+                });
 
             // Check for keybind conflicts on player join
             clientApi.Event.PlayerEntitySpawn += OnPlayerSpawn;
@@ -203,7 +206,7 @@ namespace VintageEssentials
                     var gameKey = gameHotkey.Value;
                     
                     // Compare keybinds
-                    if (gameKey.CurrentMapping.KeyCode == ParseGlKey(ourKey.Key) &&
+                    if (gameKey.CurrentMapping.KeyCode == (int)ParseGlKey(ourKey.Key) &&
                         gameKey.CurrentMapping.Shift == ourKey.Shift &&
                         gameKey.CurrentMapping.Ctrl == ourKey.Ctrl &&
                         gameKey.CurrentMapping.Alt == ourKey.Alt)

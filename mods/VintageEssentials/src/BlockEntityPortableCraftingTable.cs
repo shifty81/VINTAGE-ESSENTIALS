@@ -365,9 +365,7 @@ namespace VintageEssentials
                 ItemSlot slot = inventory[i];
                 if (slot != null && !slot.Empty)
                 {
-                    ITreeAttribute slotTree = new TreeAttribute();
-                    slot.Itemstack.ToTreeAttributes(slotTree);
-                    invTree["slot" + i] = slotTree;
+                    invTree.SetBytes("slot" + i, slot.Itemstack.ToBytes());
                 }
             }
 
@@ -391,13 +389,12 @@ namespace VintageEssentials
 
             for (int i = 0; i < savedCount && i < STORAGE_SLOTS + CRAFT_GRID_SLOTS; i++)
             {
-                ITreeAttribute slotTree = invTree.GetTreeAttribute("slot" + i);
-                if (slotTree != null)
+                byte[] slotData = invTree.GetBytes("slot" + i);
+                if (slotData != null && slotData.Length > 0)
                 {
                     try
                     {
-                        ItemStack stack = new ItemStack();
-                        stack.FromTreeAttributes(slotTree, Api.World);
+                        ItemStack stack = new ItemStack(slotData);
                         stack.ResolveBlockOrItem(Api.World);
 
                         if (stack.Collectible != null)

@@ -148,7 +148,7 @@ namespace VintageEssentials
             var textElem = SingleComposer.GetStaticText("stackSizeValue");
             if (textElem != null)
             {
-                textElem.SetNewText($"{newValue}x");
+                textElem.SetValue($"{newValue}x");
             }
             
             return true;
@@ -172,7 +172,7 @@ namespace VintageEssentials
         private bool OnChangeKeybind(string hotkeyCode)
         {
             // Check if we're already capturing a key
-            bool alreadyCapturing = capturingKeys.Values.Contains(true);
+            bool alreadyCapturing = capturingKeys.ContainsValue(true);
             if (alreadyCapturing)
             {
                 return true; // Ignore if already capturing

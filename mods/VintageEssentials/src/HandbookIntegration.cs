@@ -28,7 +28,8 @@ namespace VintageEssentials
         /// </summary>
         public void OpenHandbook()
         {
-            capi.Input.TriggerOnHotKeyPressed("handbook", false);
+            var hotkey = capi.Input.GetHotKeyByCode("handbook");
+            hotkey?.Handler?.Invoke(hotkey.CurrentMapping);
         }
 
         /// <summary>
