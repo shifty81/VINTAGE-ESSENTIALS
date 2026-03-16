@@ -8,7 +8,7 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 
 - **`/sethome`** - Sets your home location at your current position
 - **`/home`** - Teleports you to your saved home location
-- **`/rtp <direction>`** - Randomly teleports you 10,000-20,000 blocks in the specified direction (north/n, south/s, east/e, or west/w)
+- **`/rtp <direction>`** - Randomly teleports you 3,000-10,000 blocks in the specified direction (north/n, south/s, east/e, or west/w)
 
 ### Chest Radius Inventory (NEW!)
 
@@ -63,14 +63,23 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 ### Stack Size Increases
 
 - **Configurable stack sizes** - Use the slider in mod settings to adjust the multiplier (default 100x)
-- Applies to items that initially stack up to 10 (e.g., tools, equipment)
-- For items with 10x base stack: 100x multiplier = 1000 max stack
-- Adjust from 1x (vanilla) to 200x (2000 max stack) based on your preference
+- Applies to items with a base stack of 16 or more (tools, weapons, and armor are excluded)
+- For items with 16+ base stack: 100x multiplier = up to 10,000 max stack
+- Adjust from 1x (vanilla) to 200x based on your preference
 - **Requires game restart** to apply changes
 - Storage containers have increased capacity:
   - Chests: 32 slots
   - Storage Vessels: 24 slots
   - Crates: 48 slots
+
+### Conglomerate Mod Management (NEW!)
+
+- **77 curated community mods** organized into 9 categories
+- **Tabbed config dialog** (`Ctrl+Shift+V`) with dedicated tabs per category
+- **Per-mod toggles** — enable or disable individual mods with toggle switches
+- **Enable All / Disable All** buttons per category for bulk management
+- **Categories**: Storage & Inventory, Cooking & Food, Hunting & Animals, Building & Decoration, Crafting & Smithing, Combat & Skills, World & Exploration, Quality of Life, Libraries
+- Settings persist across game sessions
 
 ## Installation
 
@@ -93,7 +102,7 @@ All keybinds can be customized directly from the mod settings dialog (`Ctrl+Shif
 ## Building
 
 ### Requirements
-- .NET 7.0 SDK or later ([Download here](https://dotnet.microsoft.com/download))
+- .NET 8.0 SDK or later ([Download here](https://dotnet.microsoft.com/download))
 - Vintage Story installed ([Get it here](https://www.vintagestory.at/))
 
 ### Quick Build
@@ -185,8 +194,8 @@ Output: `bin/Release/VintageEssentials.zip`
 - Verify your Vintage Story installation path exists
 - Check that `VintagestoryAPI.dll` exists in that directory
 
-**Error: "The specified framework 'Microsoft.NETCore.App', version '7.0.0' was not found"**
-- Install .NET 7.0 SDK or later from https://dotnet.microsoft.com/download
+**Error: "The specified framework 'Microsoft.NETCore.App', version '8.0.0' was not found"**
+- Install .NET 8.0 SDK or later from https://dotnet.microsoft.com/download
 - Verify installation with `dotnet --version`
 
 **Build succeeds but mod doesn't work in-game:**
@@ -205,12 +214,12 @@ Output: `bin/Release/VintageEssentials.zip`
 ### Random Teleport
 
 Use `/rtp` with a direction to explore:
-- `/rtp north` (or `/rtp n`) - Teleport 10,000-20,000 blocks north
-- `/rtp south` (or `/rtp s`) - Teleport 10,000-20,000 blocks south
-- `/rtp east` (or `/rtp e`) - Teleport 10,000-20,000 blocks east
-- `/rtp west` (or `/rtp w`) - Teleport 10,000-20,000 blocks west
+- `/rtp north` (or `/rtp n`) - Teleport 3,000-10,000 blocks north
+- `/rtp south` (or `/rtp s`) - Teleport 3,000-10,000 blocks south
+- `/rtp east` (or `/rtp e`) - Teleport 3,000-10,000 blocks east
+- `/rtp west` (or `/rtp w`) - Teleport 3,000-10,000 blocks west
 
-The mod will force-load terrain at the target location, find a safe landing spot at ground level, and teleport you there. If the first spot isn't safe, it will automatically retry up to 5 times with different random positions.
+The mod will force-load a 5×5 grid of chunks at the target location, search a grid of 25 positions for a safe landing spot at ground level, and teleport you there. If the first spot isn't safe, it will automatically retry up to 10 times with progressive delays and different random positions.
 
 ### Chest Radius Inventory
 

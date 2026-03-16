@@ -6,7 +6,7 @@
   <a href="mods/VintageEssentials/"><img src="https://img.shields.io/badge/Vintage_Story-Mod-8B6914?style=for-the-badge" alt="VS Mod" /></a>
   <a href="#"><img src="https://img.shields.io/badge/C%23-.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="C# .NET" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" /></a>
-  <a href="mods/VintageEssentials/CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.6.0-blue?style=for-the-badge" alt="Version" /></a>
+  <a href="mods/VintageEssentials/CHANGELOG.md"><img src="https://img.shields.io/badge/Version-1.8.0-blue?style=for-the-badge" alt="Version" /></a>
 </p>
 
 <p align="center">
@@ -24,7 +24,7 @@
 ### 🏠 Teleportation Commands
 - **`/sethome`** — Save your home location
 - **`/home`** — Warp back instantly
-- **`/rtp <direction>`** — Random teleport 10k–20k blocks
+- **`/rtp <direction>`** — Random teleport 3k–10k blocks
 
 </td>
 <td width="50%">
@@ -56,6 +56,18 @@
 
 </td>
 </tr>
+<tr>
+<td colspan="2">
+
+### 🗂️ Conglomerate Mod Management
+- **Tabbed Config Dialog** — 10-tab interface (General + 9 mod categories)
+- **77 Community Mods** — curated collection organized by category
+- **Per-Mod Toggles** — enable/disable individual mods with toggle switches
+- **Bulk Actions** — Enable All / Disable All per category
+- **Persistent Settings** — mod states saved across sessions
+
+</td>
+</tr>
 </table>
 
 ---
@@ -65,13 +77,14 @@
 ```
 VINTAGE-ESSENTIALS/
 ├── mods/
-│   └── VintageEssentials/          🎮 Quality of life mod
-│       ├── src/                    📝 C# source code
-│       ├── assets/                 🎨 Game assets (patches, shapes, lang)
-│       ├── modinfo.json            📋 Mod metadata
-│       ├── VintageEssentials.csproj
-│       ├── CHANGELOG.md
-│       └── PORTABLE_CRAFTING_SPEC.md
+│   ├── VintageEssentials/          🎮 Quality of life mod
+│   │   ├── src/                    📝 C# source code
+│   │   ├── assets/                 🎨 Game assets (patches, shapes, lang)
+│   │   ├── modinfo.json            📋 Mod metadata
+│   │   ├── VintageEssentials.csproj
+│   │   ├── CHANGELOG.md
+│   │   └── PORTABLE_CRAFTING_SPEC.md
+│   └── Conglomerate/               📦 77 curated community mods
 ├── assets/                         🖼️ Repository assets (banner, images)
 ├── MODDING_GUIDELINES.md           📖 Shared modding reference
 ├── ASSET_GENERATION.md             🎨 Asset creation guide
@@ -84,6 +97,7 @@ VINTAGE-ESSENTIALS/
 | Mod | Description | Folder |
 |:---:|-------------|:------:|
 | **[Vintage Essentials](mods/VintageEssentials/)** | Essential commands and quality of life improvements including `/home`, `/sethome`, `/rtp`, chest radius inventory, inventory sorting, slot locking, configurable stack sizes, and portable crafting table with cloud crafting, handbook integration, and block portability | `mods/VintageEssentials/` |
+| **Conglomerate Collection** | 77 curated community mods organized into 9 categories (Storage, Cooking, Hunting, Building, Crafting, Combat, World & Exploration, Quality of Life, Libraries) — managed through the in-game tabbed config dialog | `mods/Conglomerate/` |
 
 ## 🚀 Getting Started
 
