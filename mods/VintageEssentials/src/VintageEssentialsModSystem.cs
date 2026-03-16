@@ -343,21 +343,18 @@ namespace VintageEssentials
                 }
                 catch (Exception ex)
                 {
-                    // Log the error and ensure retries continue despite exceptions
+                    // Log the error and ensure retries continue despite exceptions.
+                    // Without this catch, a single exception silently aborts all remaining retries.
                     serverApi.Logger.Error($"VintageEssentials: RTP attempt {capturedAttempt + 1} failed with exception: {ex.Message}");
-                    try
+                    if (capturedAttempt + 1 < maxAttempts)
                     {
                         TryRtpAttempt(player, direction, capturedAttempt + 1);
                     }
-                    catch (Exception)
+                    else
                     {
-                        try
-                        {
-                            player.SendMessage(GlobalConstants.GeneralChatGroup,
-                                "An error occurred during teleport. Please try again.",
-                                EnumChatType.CommandError);
-                        }
-                        catch { /* Player may have disconnected */ }
+                        player.SendMessage(GlobalConstants.GeneralChatGroup,
+                            "An error occurred during teleport. Please try again.",
+                            EnumChatType.CommandError);
                     }
                 }
             }, delayMs);

@@ -31,7 +31,7 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
   - **Player progress feedback**: Players now receive a notification on each retry attempt ("Attempt X/10 — searching a new area...") so they know the search is still active.
   - **Reduced RTP distance**: Lowered the random distance range from 10k–20k to 3k–10k blocks, which significantly improves chunk generation reliability at unvisited locations.
   - **Cleaner block scanning**: Refactored `FindSurfaceY` to skip null/air/liquid/lava blocks early with `continue` instead of nesting all logic inside a single large conditional.
-  - **3×3 chunk loading**: Force-loads chunk columns around the target to ensure proper world generation (terrain gen depends on neighbor chunks).
+  - **Chunk pre-loading**: Force-loads chunk columns around the target to ensure proper world generation (terrain gen depends on neighbor chunks).
   - **Passable block detection**: Surface check accepts plants, snow, and leaves as passable blocks above the ground, not just air.
   - **Lava exclusion**: Lava blocks are excluded from valid ground surfaces (separate from `EnumBlockMaterial.Liquid`).
   - **10 retry attempts** with ±500 block perpendicular offset so retries explore different terrain.
