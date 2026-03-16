@@ -4,6 +4,24 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 
 ## [Unreleased]
 
+### Added
+- **Tabbed Configuration Menu** — `ModConfigDialog`:
+  - Refactored the settings dialog from a single flat panel to a tabbed interface with 10 tabs.
+  - **General tab**: Retains all existing settings (max locked slots, stack size multiplier, keybind customization).
+  - **9 category tabs**: Storage & Inventory, Cooking & Food, Hunting & Animals, Building & Decoration, Crafting & Smithing, Combat & Skills, World & Exploration, Quality of Life, and Libraries.
+  - Each category tab displays all conglomerate mods in that category with toggle switches and descriptions.
+  - **Enable All / Disable All** buttons per category for quick bulk management.
+  - Mod enable/disable state persists in the config file across sessions.
+
+- **Conglomerate Mod Manager** — `ConglomerateModManager`:
+  - New static manager that catalogs all 77 mods from the Conglomerate folder.
+  - Mods are organized into 9 categories with display names and descriptions.
+  - Provides category lookup, mod listing, and metadata access.
+
+- **Extended Config** — `ModConfig`:
+  - Added `ConglomerateModsEnabled` dictionary to persist per-mod enable/disable state.
+  - Added `IsModEnabled()`, `SetModEnabled()`, and `EnsureConglomerateDefaults()` methods.
+
 ### Fixed
 - **RTP Safe Location — Still Failing to Find Safe Ground** — `VintageEssentialsModSystem`:
   - **3×3 chunk loading**: Now force-loads a 3×3 grid of chunk columns around the target instead of a single column, ensuring proper world generation (terrain gen depends on neighbor chunks).

@@ -17,6 +17,36 @@ namespace VintageEssentials
         public int MaxLockedSlots { get; set; } = 10;
         public int StackSizeMultiplier { get; set; } = 100; // Default 100x multiplier (1000 max stack for 10x items)
         public Dictionary<string, KeybindConfig> CustomKeybinds { get; set; } = new Dictionary<string, KeybindConfig>();
+        public Dictionary<string, bool> ConglomerateModsEnabled { get; set; } = new Dictionary<string, bool>();
+
+        public bool IsModEnabled(string fileName)
+        {
+            if (ConglomerateModsEnabled.TryGetValue(fileName, out bool enabled))
+            {
+                return enabled;
+            }
+            return true; // Default to enabled
+        }
+
+        public void SetModEnabled(string fileName, bool enabled)
+        {
+            ConglomerateModsEnabled[fileName] = enabled;
+        }
+
+        public void EnsureConglomerateDefaults()
+        {
+            if (ConglomerateModsEnabled == null)
+            {
+                ConglomerateModsEnabled = new Dictionary<string, bool>();
+            }
+            foreach (var mod in ConglomerateModManager.GetAllMods())
+            {
+                if (!ConglomerateModsEnabled.ContainsKey(mod.FileName))
+                {
+                    ConglomerateModsEnabled[mod.FileName] = true;
+                }
+            }
+        }
         
         public static ModConfig Load(ICoreAPI api)
         {
@@ -27,6 +57,7 @@ namespace VintageEssentials
                 {
                     config = new ModConfig();
                     config.InitializeDefaultKeybinds();
+                    config.EnsureConglomerateDefaults();
                     api.StoreModConfig(config, "vintageessentials.json");
                 }
                 else
@@ -34,6 +65,7 @@ namespace VintageEssentials
                     // Ensure all keybinds exist (for updates)
                     config.EnsureKeybindsExist();
                 }
+                config.EnsureConglomerateDefaults();
                 return config;
             }
             catch (Exception e)
@@ -41,6 +73,7 @@ namespace VintageEssentials
                 api.Logger.Error("VintageEssentials: Failed to load config, using defaults: " + e.Message);
                 var config = new ModConfig();
                 config.InitializeDefaultKeybinds();
+                config.EnsureConglomerateDefaults();
                 return config;
             }
         }
