@@ -2,7 +2,7 @@
 
 All notable changes to the Vintage Essentials mod will be documented in this file.
 
-## [Unreleased]
+## [1.8.0] - 2026-03-16
 
 ### Added
 - **Tabbed Configuration Menu** — `ModConfigDialog`:
