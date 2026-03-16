@@ -16,6 +16,11 @@ namespace VintageEssentials
         private Dictionary<string, bool> tempModToggles = new Dictionary<string, bool>();
         private int currentTab = 0;
 
+        private const string TabActiveIndicator = "\u25B8 ";
+        private const string TabInactiveIndicator = "  ";
+        private const double DescriptionAlpha = 0.7;
+        private const double DescriptionFontSizeReduction = 2;
+
         private static readonly string[] TabNames = new string[]
         {
             "General",
@@ -59,7 +64,7 @@ namespace VintageEssentials
             for (int i = 0; i < TabNames.Length; i++)
             {
                 int tabIndex = i;
-                string prefix = (i == currentTab) ? "\u25B8 " : "  ";
+                string prefix = (i == currentTab) ? TabActiveIndicator : TabInactiveIndicator;
                 string tabLabel = prefix + TabNames[i];
                 ElementBounds tabBounds = ElementBounds.Fixed(0, tabY, tabWidth, 28);
                 allBounds.Add(tabBounds);
@@ -270,8 +275,8 @@ namespace VintageEssentials
                 allBounds.Add(modDescBounds);
 
                 var smallFont = CairoFont.WhiteSmallText();
-                smallFont.Color[3] = 0.7;
-                smallFont.UnscaledFontsize -= 2;
+                smallFont.Color[3] = DescriptionAlpha;
+                smallFont.UnscaledFontsize -= DescriptionFontSizeReduction;
                 composer.AddStaticText(mod.Description, smallFont, modDescBounds);
                 currentY += 25;
             }
