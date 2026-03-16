@@ -24,14 +24,19 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
 
 ### Fixed
 - **RTP Safe Location — Still Failing to Find Safe Ground** — `VintageEssentialsModSystem`:
-  - **3×3 chunk loading**: Now force-loads a 3×3 grid of chunk columns around the target instead of a single column, ensuring proper world generation (terrain gen depends on neighbor chunks).
-  - **Increased wait time**: Extended chunk generation delay from 2 seconds to 5 seconds to allow the server enough time to generate terrain at distant unvisited locations.
-  - **Passable block detection**: Surface check now accepts plants, snow, and leaves as passable blocks above the ground, not just air. Previously, landing on terrain with tall grass or snow would incorrectly report "no safe location."
-  - **Lava exclusion**: Lava blocks are now excluded from valid ground surfaces (previously only liquid was excluded, but Lava is a separate material).
-  - **More retry attempts**: Increased max attempts from 5 to 10 for better success rate.
-  - **Lateral offset on retries**: Each attempt now applies a random ±500 block perpendicular offset so retries explore different terrain rather than testing positions along the same line.
-  - **Unloaded chunk detection**: Added logging when an entire column returns no solid blocks, indicating the chunk may not have loaded in time.
-  - **Debug logging**: RTP retry attempts are now logged with position info for server-side troubleshooting.
+  - **5×5 chunk loading**: Expanded chunk pre-loading grid from 3×3 (9 chunks) to 5×5 (25 chunks) around the target, providing fuller neighbor coverage for world generation.
+  - **Grid surface search**: Each attempt now searches a 5×5 grid of block columns (25 positions at ±4/±8 block offsets) instead of a single column, greatly increasing the chance of finding safe ground even on difficult terrain.
+  - **Progressive delays**: Wait time now increases with each retry (5s base + 1s per attempt) to give the server more time for terrain generation at new locations.
+  - **Exception-safe retries**: Wrapped the async callback in try-catch to prevent silent failures — if an exception occurs during surface scanning, the retry chain continues instead of silently aborting.
+  - **Player progress feedback**: Players now receive a notification on each retry attempt ("Attempt X/10 — searching a new area...") so they know the search is still active.
+  - **Reduced RTP distance**: Lowered the random distance range from 10k–20k to 3k–10k blocks, which significantly improves chunk generation reliability at unvisited locations.
+  - **Cleaner block scanning**: Refactored `FindSurfaceY` to skip null/air/liquid/lava blocks early with `continue` instead of nesting all logic inside a single large conditional.
+  - **3×3 chunk loading**: Force-loads chunk columns around the target to ensure proper world generation (terrain gen depends on neighbor chunks).
+  - **Passable block detection**: Surface check accepts plants, snow, and leaves as passable blocks above the ground, not just air.
+  - **Lava exclusion**: Lava blocks are excluded from valid ground surfaces (separate from `EnumBlockMaterial.Liquid`).
+  - **10 retry attempts** with ±500 block perpendicular offset so retries explore different terrain.
+  - **Unloaded chunk detection**: Logs when an entire column returns no solid blocks, indicating the chunk may not have loaded in time.
+  - **Debug logging**: RTP retry attempts are logged with position info for server-side troubleshooting.
 
 - **Player Inventory Sort — Crash and World Corruption** — `PlayerInventorySortDialog.SortPlayerInventory()`:
   - **Crash**: `MarkDirty()` threw `ArgumentException: Supplied slot is not part of this inventory` because slots collected via `foreach` iterator lost their inventory association. Now accesses slots by index through `playerInv[index]` so the inventory correctly recognizes the slot.

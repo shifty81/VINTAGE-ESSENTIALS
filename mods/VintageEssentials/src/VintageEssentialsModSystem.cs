@@ -232,36 +232,35 @@ namespace VintageEssentials
                 return;
             }
 
-            // Calculate random distance between 10,000 and 20,000 blocks
-            double minDistance = 10000;
-            double maxDistance = 20000;
+            // Notify player of progress on retries so they know it's still working
+            if (attempt > 0)
+            {
+                player.SendMessage(GlobalConstants.GeneralChatGroup,
+                    $"Attempt {attempt + 1}/{maxAttempts} — searching a new area...",
+                    EnumChatType.Notification);
+            }
+
+            // Random distance between 3,000 and 10,000 blocks — reduced from 10k-20k
+            // for more reliable chunk generation at unvisited locations
+            double minDistance = 3000;
+            double maxDistance = 10000;
             Random rand = new Random();
             double distance = rand.NextDouble() * (maxDistance - minDistance) + minDistance;
 
-            // Add a random perpendicular offset (±500 blocks) so retries explore different terrain
+            // Random perpendicular offset (±500 blocks) so retries explore different terrain
             double lateralOffset = (rand.NextDouble() - 0.5) * 1000;
 
             Vec3d currentPos = player.Entity.Pos.XYZ;
             double newX = currentPos.X;
             double newZ = currentPos.Z;
 
-            // Calculate new position based on direction
             // In Vintage Story, negative Z is North, positive Z is South
-            // Lateral offset is applied perpendicular to the travel direction
             switch (direction)
             {
-                case "north":
-                    newZ -= distance;
-                    break;
-                case "south":
-                    newZ += distance;
-                    break;
-                case "east":
-                    newX += distance;
-                    break;
-                case "west":
-                    newX -= distance;
-                    break;
+                case "north": newZ -= distance; break;
+                case "south": newZ += distance; break;
+                case "east":  newX += distance; break;
+                case "west":  newX -= distance; break;
             }
 
             // Apply perpendicular offset: X-axis for north/south, Z-axis for east/west
@@ -270,15 +269,15 @@ namespace VintageEssentials
             else
                 newZ += lateralOffset;
 
-            // Force-load a 3x3 grid of chunk columns around the target so terrain
-            // generates properly (world gen often needs neighbor chunks).
+            // Force-load a 5x5 grid of chunk columns around the target so terrain
+            // generates properly (world gen depends on neighbor chunks).
             int chunkSize = GlobalConstants.ChunkSize;
             int centerChunkX = (int)Math.Floor(newX / chunkSize);
             int centerChunkZ = (int)Math.Floor(newZ / chunkSize);
 
-            for (int dx = -1; dx <= 1; dx++)
+            for (int dx = -2; dx <= 2; dx++)
             {
-                for (int dz = -1; dz <= 1; dz++)
+                for (int dz = -2; dz <= 2; dz++)
                 {
                     serverApi.WorldManager.LoadChunkColumnPriority(centerChunkX + dx, centerChunkZ + dz);
                 }
@@ -290,34 +289,78 @@ namespace VintageEssentials
             double capturedDistance = distance;
             int capturedAttempt = attempt;
 
-            // Wait for chunks to generate/load before checking block data.
-            // 5 seconds gives the server time to generate terrain for new chunk columns at far distances.
+            // Progressive delay: 5s base + 1s per attempt — later attempts give
+            // the server more time to generate terrain at far locations.
+            int delayMs = 5000 + (attempt * 1000);
+
             serverApi.Event.RegisterCallback((deltaTime) =>
             {
-                // Verify the player is still connected
-                if (player?.Entity == null || player.ConnectionState != EnumClientState.Playing)
+                try
                 {
-                    return;
-                }
+                    // Verify the player is still connected
+                    if (player?.Entity == null || player.ConnectionState != EnumClientState.Playing)
+                    {
+                        return;
+                    }
 
-                BlockPos targetPos = new BlockPos((int)capturedX, 0, (int)capturedZ);
-                int surfaceY = FindSurfaceY(targetPos);
+                    // Search a grid of nearby columns (up to 25 positions) for any safe landing spot.
+                    // This greatly increases the chance of finding safe ground even when some columns
+                    // have difficult terrain (trees, cliffs, caves).
+                    int foundY = -1;
+                    double teleX = capturedX;
+                    double teleZ = capturedZ;
 
-                if (surfaceY > 0)
-                {
-                    Vec3d teleportPos = new Vec3d(capturedX, surfaceY + 1, capturedZ);
-                    player.Entity.TeleportTo(teleportPos);
-                    player.SendMessage(GlobalConstants.GeneralChatGroup,
-                        $"Randomly warped {direction} to {capturedX:F0}, {surfaceY}, {capturedZ:F0} ({capturedDistance:F0} blocks away)",
-                        EnumChatType.CommandSuccess);
+                    int[] searchOffsets = { 0, -4, 4, -8, 8 };
+                    foreach (int dx in searchOffsets)
+                    {
+                        if (foundY > 0) break;
+                        foreach (int dz in searchOffsets)
+                        {
+                            BlockPos pos = new BlockPos((int)capturedX + dx, 0, (int)capturedZ + dz);
+                            foundY = FindSurfaceY(pos);
+                            if (foundY > 0)
+                            {
+                                teleX = capturedX + dx;
+                                teleZ = capturedZ + dz;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (foundY > 0)
+                    {
+                        Vec3d teleportPos = new Vec3d(teleX, foundY + 1, teleZ);
+                        player.Entity.TeleportTo(teleportPos);
+                        player.SendMessage(GlobalConstants.GeneralChatGroup,
+                            $"Randomly warped {direction} to {teleX:F0}, {foundY}, {teleZ:F0} ({capturedDistance:F0} blocks away)",
+                            EnumChatType.CommandSuccess);
+                    }
+                    else
+                    {
+                        serverApi.Logger.Debug($"VintageEssentials: RTP attempt {capturedAttempt + 1}/{maxAttempts} at {capturedX:F0},{capturedZ:F0} — no safe surface found, retrying...");
+                        TryRtpAttempt(player, direction, capturedAttempt + 1);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    serverApi.Logger.Debug($"VintageEssentials: RTP attempt {capturedAttempt + 1}/{maxAttempts} at {capturedX:F0},{capturedZ:F0} — no safe surface found, retrying...");
-                    // Retry with a new random position
-                    TryRtpAttempt(player, direction, capturedAttempt + 1);
+                    // Log the error and ensure retries continue despite exceptions
+                    serverApi.Logger.Error($"VintageEssentials: RTP attempt {capturedAttempt + 1} failed with exception: {ex.Message}");
+                    try
+                    {
+                        TryRtpAttempt(player, direction, capturedAttempt + 1);
+                    }
+                    catch (Exception)
+                    {
+                        try
+                        {
+                            player.SendMessage(GlobalConstants.GeneralChatGroup,
+                                "An error occurred during teleport. Please try again.",
+                                EnumChatType.CommandError);
+                        }
+                        catch { /* Player may have disconnected */ }
+                    }
                 }
-            }, 5000);
+            }, delayMs);
         }
 
         /// <summary>
@@ -347,26 +390,32 @@ namespace VintageEssentials
                 BlockPos checkPos = new BlockPos(pos.X, y, pos.Z);
                 Block block = blockAccessor.GetBlock(checkPos);
 
-                if (block != null && block.Id != 0
-                    && block.BlockMaterial != EnumBlockMaterial.Air
-                    && block.BlockMaterial != EnumBlockMaterial.Liquid
-                    && block.BlockMaterial != EnumBlockMaterial.Lava)
+                if (block == null || block.Id == 0) continue;
+
+                var mat = block.BlockMaterial;
+
+                // Skip air, liquid, and lava entirely
+                if (mat == EnumBlockMaterial.Air
+                    || mat == EnumBlockMaterial.Liquid
+                    || mat == EnumBlockMaterial.Lava)
                 {
-                    foundAnySolidBlock = true;
+                    continue;
+                }
 
-                    // Skip passable surface blocks (plants, snow, leaves) — they're not solid ground
-                    if (IsBlockPassable(block)) continue;
+                foundAnySolidBlock = true;
 
-                    // Found a solid non-liquid block, check if there's space above for the player (2 blocks)
-                    BlockPos checkPosAbove = new BlockPos(checkPos.X, checkPos.Y + 1, checkPos.Z);
-                    BlockPos checkPosAbove2 = new BlockPos(checkPos.X, checkPos.Y + 2, checkPos.Z);
-                    Block blockAbove = blockAccessor.GetBlock(checkPosAbove);
-                    Block blockAbove2 = blockAccessor.GetBlock(checkPosAbove2);
+                // Skip passable surface blocks (plants, snow, leaves) — they're not solid ground
+                if (IsBlockPassable(block)) continue;
 
-                    if (IsBlockPassable(blockAbove) && IsBlockPassable(blockAbove2))
-                    {
-                        return y;
-                    }
+                // Found a solid non-liquid block, check if there's space above for the player (2 blocks)
+                BlockPos abovePos1 = new BlockPos(pos.X, y + 1, pos.Z);
+                BlockPos abovePos2 = new BlockPos(pos.X, y + 2, pos.Z);
+                Block blockAbove1 = blockAccessor.GetBlock(abovePos1);
+                Block blockAbove2 = blockAccessor.GetBlock(abovePos2);
+
+                if (IsBlockPassable(blockAbove1) && IsBlockPassable(blockAbove2))
+                {
+                    return y;
                 }
             }
 
