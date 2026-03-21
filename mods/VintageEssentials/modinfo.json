@@ -3,8 +3,8 @@
   "modid": "vintageessentials",
   "name": "Vintage Essentials",
   "author": "shifty81",
-  "description": "Essential commands and quality of life improvements including /home, /sethome, /rtp commands, chest radius inventory, player inventory sorting, inventory slot locking, increased stack sizes, portable crafting table with handbook integration, block pickup with inventory preservation, and integrated conglomerate mod management with tabbed configuration",
-  "version": "1.8.0",
+  "description": "Essential commands and quality of life improvements including /home, /sethome, /back, /spawn, /rtp commands, chest radius inventory, player inventory sorting, inventory slot locking, increased stack sizes, portable crafting table with handbook integration, block pickup with inventory preservation, and integrated conglomerate mod management with tabbed configuration",
+  "version": "1.9.0",
   "dependency": {
     "game": "1.19.0"
   },

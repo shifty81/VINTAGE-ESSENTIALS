@@ -2,6 +2,26 @@
 
 All notable changes to the Vintage Essentials mod will be documented in this file.
 
+## [1.9.0] - 2026-03-21
+
+### Added
+- **`/back` command** — `VintageEssentialsModSystem`:
+  - Teleports you back to your last position before any teleport command (`/home`, `/rtp`, `/spawn`).
+  - Using `/back` again swaps positions, allowing you to toggle back and forth between two locations.
+  - Works across all teleport commands: position is saved automatically before each teleport.
+
+- **`/spawn` command** — `VintageEssentialsModSystem`:
+  - Teleports you to the world's default spawn point.
+  - Saves your current position before teleporting so `/back` can return you.
+
+- **Back-position tracking** — `VintageEssentialsModSystem`:
+  - New in-memory `backPositions` dictionary (keyed by player UID) stores the position to return to.
+  - `SaveBackPosition()` helper called at the start of every teleport to capture the pre-teleport location.
+  - `/home` and `/rtp` (at attempt 0) now also save the back position, making `/back` useful after all teleport commands.
+
+### Fixed
+- **Mod count documentation** — README and CHANGELOG previously stated "77 curated community mods"; corrected to **74** to match the actual number of mods in the Conglomerate folder and `ConglomerateModManager`.
+
 ## [1.8.0] - 2026-03-16
 
 ### Added
@@ -14,7 +34,7 @@ All notable changes to the Vintage Essentials mod will be documented in this fil
   - Mod enable/disable state persists in the config file across sessions.
 
 - **Conglomerate Mod Manager** — `ConglomerateModManager`:
-  - New static manager that catalogs all 77 mods from the Conglomerate folder.
+  - New static manager that catalogs all 74 mods from the Conglomerate folder.
   - Mods are organized into 9 categories with display names and descriptions.
   - Provides category lookup, mod listing, and metadata access.
 
