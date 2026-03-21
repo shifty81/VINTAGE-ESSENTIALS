@@ -12,6 +12,7 @@ namespace VintageEssentials
     {
         private ICoreServerAPI serverApi;
         private Dictionary<string, Vec3d> playerHomes = new Dictionary<string, Vec3d>();
+        private Dictionary<string, Vec3d> backPositions = new Dictionary<string, Vec3d>();
         private const string HOMES_DATA_KEY = "vintageessentials:homes";
         private LockedSlotsManager lockedSlotsManager;
         private ModConfig config;
@@ -99,6 +100,16 @@ namespace VintageEssentials
                 .RequiresPrivilege(Privilege.chat)
                 .HandleWith(OnRtp);
 
+            api.ChatCommands.Create("back")
+                .WithDescription("Teleports you back to your last location before a teleport")
+                .RequiresPrivilege(Privilege.chat)
+                .HandleWith(OnBack);
+
+            api.ChatCommands.Create("spawn")
+                .WithDescription("Teleports you to the world spawn point")
+                .RequiresPrivilege(Privilege.chat)
+                .HandleWith(OnSpawn);
+
             // Save data periodically and on shutdown
             api.Event.SaveGameLoaded += OnSaveGameLoaded;
             api.Event.GameWorldSave += OnGameWorldSave;
@@ -176,12 +187,67 @@ namespace VintageEssentials
 
             if (playerHomes.TryGetValue(player.PlayerUID, out Vec3d homePos))
             {
+                SaveBackPosition(player);
                 player.Entity.TeleportTo(homePos);
                 return TextCommandResult.Success("Welcome home!");
             }
             else
             {
                 return TextCommandResult.Error("You haven't set a home yet! Use /sethome first.");
+            }
+        }
+
+        private TextCommandResult OnBack(TextCommandCallingArgs args)
+        {
+            IServerPlayer player = args.Caller.Player as IServerPlayer;
+            if (player == null)
+            {
+                return TextCommandResult.Error("Only players can use this command.");
+            }
+
+            if (backPositions.TryGetValue(player.PlayerUID, out Vec3d backPos))
+            {
+                // Swap: save current position as the new back target so the player can toggle
+                Vec3d currentPos = player.Entity.Pos.XYZ;
+                backPositions[player.PlayerUID] = currentPos;
+                player.Entity.TeleportTo(backPos);
+                return TextCommandResult.Success($"Teleported back to {backPos.X:F0}, {backPos.Y:F0}, {backPos.Z:F0}");
+            }
+            else
+            {
+                return TextCommandResult.Error("No previous location found. Use /home, /rtp, or /spawn first.");
+            }
+        }
+
+        private TextCommandResult OnSpawn(TextCommandCallingArgs args)
+        {
+            IServerPlayer player = args.Caller.Player as IServerPlayer;
+            if (player == null)
+            {
+                return TextCommandResult.Error("Only players can use this command.");
+            }
+
+            BlockPos spawnPos = serverApi.World.DefaultSpawnPosition;
+            if (spawnPos == null)
+            {
+                return TextCommandResult.Error("Could not determine world spawn position.");
+            }
+
+            SaveBackPosition(player);
+            Vec3d spawnVec = new Vec3d(spawnPos.X + 0.5, spawnPos.Y, spawnPos.Z + 0.5);
+            player.Entity.TeleportTo(spawnVec);
+            return TextCommandResult.Success($"Teleported to world spawn at {spawnPos.X}, {spawnPos.Y}, {spawnPos.Z}");
+        }
+
+        /// <summary>
+        /// Saves the player's current position as the "back" position so that /back can return them here.
+        /// Called before any teleport command (/home, /rtp, /spawn).
+        /// </summary>
+        private void SaveBackPosition(IServerPlayer player)
+        {
+            if (player?.Entity != null)
+            {
+                backPositions[player.PlayerUID] = player.Entity.Pos.XYZ;
             }
         }
 
@@ -230,6 +296,12 @@ namespace VintageEssentials
             {
                 player.SendMessage(GlobalConstants.GeneralChatGroup, "Failed to find a safe location after multiple attempts. Please try again.", EnumChatType.CommandError);
                 return;
+            }
+
+            // Save the player's current position before beginning the first attempt so /back works
+            if (attempt == 0)
+            {
+                SaveBackPosition(player);
             }
 
             // Notify player of progress on retries so they know it's still working

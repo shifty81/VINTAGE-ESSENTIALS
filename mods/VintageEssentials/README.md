@@ -8,6 +8,8 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 
 - **`/sethome`** - Sets your home location at your current position
 - **`/home`** - Teleports you to your saved home location
+- **`/back`** - Teleports you back to your last location before a teleport (works after `/home`, `/rtp`, and `/spawn`)
+- **`/spawn`** - Teleports you to the world spawn point
 - **`/rtp <direction>`** - Randomly teleports you 3,000-10,000 blocks in the specified direction (north/n, south/s, east/e, or west/w)
 
 ### Chest Radius Inventory (NEW!)
@@ -74,7 +76,7 @@ A comprehensive mod for Vintage Story that adds essential commands and quality o
 
 ### Conglomerate Mod Management (NEW!)
 
-- **77 curated community mods** organized into 9 categories
+- **74 curated community mods** organized into 9 categories
 - **Tabbed config dialog** (`Ctrl+Shift+V`) with dedicated tabs per category
 - **Per-mod toggles** — enable or disable individual mods with toggle switches
 - **Enable All / Disable All** buttons per category for bulk management
@@ -210,6 +212,17 @@ Output: `bin/Release/VintageEssentials.zip`
 1. Navigate to where you want your home to be
 2. Type `/sethome` in chat
 3. Use `/home` anytime to teleport back
+4. Use `/back` after `/home` to return to where you were before
+
+### Returning to Your Last Location
+
+Use `/back` after any teleport command to return to where you were:
+- `/back` — Teleport to the position you were at before your last `/home`, `/rtp`, or `/spawn`
+- Using `/back` again will toggle you back to the other location (so you can switch back and forth)
+
+### World Spawn
+
+Use `/spawn` to teleport to the world's default spawn point. Your previous position is saved automatically, so you can use `/back` to return.
 
 ### Random Teleport
 
